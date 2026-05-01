@@ -1,0 +1,25 @@
+package com.custard.ehr.shared.security;
+
+public enum Permission {
+    PATIENT_REGISTER,
+    PATIENT_VIEW,
+
+    ENCOUNTER_CREATE,
+    ENCOUNTER_VIEW,
+    ENCOUNTER_COMPLETE,
+
+    VITALS_RECORD,
+    CONSULTATION_WRITE,
+
+    PRESCRIPTION_CREATE,
+    PRESCRIPTION_VIEW,
+
+    LAB_ORDER_CREATE,
+    LAB_RESULT_WRITE,
+
+    PHARMACY_DISPENSE,
+
+    PAYMENT_UPDATE,
+
+    AUDIT_VIEW
+}
