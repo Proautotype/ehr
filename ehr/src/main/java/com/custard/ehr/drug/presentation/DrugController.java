@@ -2,7 +2,14 @@ package com.custard.ehr.drug.presentation;
 
 import com.custard.ehr.drug.application.dto.DrugResponse;
 import com.custard.ehr.drug.application.service.DrugService;
-import com.custard.ehr.shared.infrastruture.web.ApiResponse;
+import com.custard.ehr.shared.infrastruture.web.AppApiResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +21,8 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/drugs")
 @Slf4j
+@Tag(name = "Drugs", description = "Drug catalog and search APIs")
+@SecurityRequirement(name = "bearerAuth")
 public class DrugController {
 
     private final Logger log = LoggerFactory.getLogger(this.getClass());
@@ -25,14 +34,40 @@ public class DrugController {
     }
 
     @GetMapping("/search")
-    public ApiResponse<List<DrugResponse>> search(@RequestParam String query) {
+    @Operation(
+            summary = "Search drugs",
+            description = "Search drug catalog by name, code, or keyword"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Search results retrieved successfully",
+                    content = @Content(schema = @Schema(implementation = DrugResponse.class))
+            ),
+            @ApiResponse(responseCode = "400", description = "Invalid search query"),
+            @ApiResponse(responseCode = "403", description = "Forbidden")
+    })
+    public AppApiResponse<List<DrugResponse>> search(@RequestParam String query) {
         log.info("Drug search request: {}", query);
-        return ApiResponse.success(drugService.search(query));
+        return AppApiResponse.success(drugService.search(query));
     }
 
     @GetMapping("/{id}")
-    public ApiResponse<DrugResponse> get(@PathVariable UUID id) {
+    @Operation(
+            summary = "Get drug by ID",
+            description = "Fetch a drug by its unique identifier"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Drug retrieved successfully",
+                    content = @Content(schema = @Schema(implementation = DrugResponse.class))
+            ),
+            @ApiResponse(responseCode = "404", description = "Drug not found"),
+            @ApiResponse(responseCode = "403", description = "Forbidden")
+    })
+    public AppApiResponse<DrugResponse> get(@PathVariable UUID id) {
         log.debug("Fetching drug ID: {}", id);
-        return ApiResponse.success(drugService.get(id));
+        return AppApiResponse.success(drugService.get(id));
     }
 }

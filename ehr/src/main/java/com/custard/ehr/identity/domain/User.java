@@ -79,6 +79,19 @@ public class User extends AuditableEntity {
     }
 
     public void assignRole(AppRole role) {
-        this.roles.add(new UserRole(this, role));
+        boolean alreadyAssigned = this.roles.stream()
+                .anyMatch(userRole -> userRole.getRole().getName() == role.getName());
+
+        if (!alreadyAssigned) {
+            this.roles.add(new UserRole(this, role));
+        }
+    }
+
+    public void resetPassword(String passwordHash) {
+        this.passwordHash = passwordHash;
+    }
+
+    public void clearRoles() {
+        this.roles.clear();
     }
 }

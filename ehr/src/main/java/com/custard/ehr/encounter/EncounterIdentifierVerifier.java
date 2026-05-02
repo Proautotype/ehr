@@ -2,7 +2,6 @@ package com.custard.ehr.encounter;
 
 import com.custard.ehr.encounter.application.ports.EncounterRepository;
 import com.custard.ehr.encounter.domain.EncounterStatus;
-import com.custard.ehr.shared.domain.EncounterLookupView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

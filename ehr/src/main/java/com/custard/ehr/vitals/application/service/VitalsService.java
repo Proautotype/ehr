@@ -2,7 +2,6 @@ package com.custard.ehr.vitals.application.service;
 
 import com.custard.ehr.encounter.EncounterIdentifierVerifier;
 import com.custard.ehr.patient.PatientIdentifierVerifier;
-import com.custard.ehr.shared.domain.EncounterLookupView;
 import com.custard.ehr.shared.events.VitalsRecordedEvent;
 import com.custard.ehr.shared.exception.BusinessException;
 import com.custard.ehr.shared.exception.NotFoundException;

@@ -145,4 +145,135 @@ public class AuditEventListener {
                         " was not fully dispensed. Reason: " + event.reason()
         );
     }
+
+    @ApplicationModuleListener
+    public void onInvoiceCreated(InvoiceCreatedEvent event) {
+        auditService.record(
+                "INVOICE_CREATED",
+                "payment",
+                "Invoice",
+                event.invoiceId(),
+                event.createdBy(),
+                null,
+                event.createdAt(),
+                "Invoice created for patient: " + event.patientId() +
+                        " with total amount: " + event.totalAmount()
+        );
+    }
+
+    @ApplicationModuleListener
+    public void onPaymentRecorded(PaymentRecordedEvent event) {
+        auditService.record(
+                "PAYMENT_RECORDED",
+                "payment",
+                "Payment",
+                event.paymentId(),
+                event.receivedBy(),
+                null,
+                event.paidAt(),
+                "Payment of " + event.amount() +
+                        " recorded using " + event.method()
+        );
+    }
+
+    @ApplicationModuleListener
+    public void onInvoiceWaived(InvoiceWaivedEvent event) {
+        auditService.record(
+                "INVOICE_WAIVED",
+                "payment",
+                "Invoice",
+                event.invoiceId(),
+                event.waivedBy(),
+                null,
+                event.waivedAt(),
+                "Invoice waived for patient: " + event.patientId()
+        );
+    }
+
+    @ApplicationModuleListener
+    public void onLabOrderCreated(LabOrderCreatedEvent event) {
+        auditService.record(
+                "LAB_ORDER_CREATED",
+                "laboratory",
+                "LabOrder",
+                event.labOrderId(),
+                event.orderedBy(),
+                null,
+                event.orderedAt(),
+                "Lab order created for patient: " + event.patientId() +
+                        " under encounter: " + event.encounterId()
+        );
+    }
+
+    @ApplicationModuleListener
+    public void onLabResultRecorded(LabResultRecordedEvent event) {
+        auditService.record(
+                event.orderCompleted() ? "LAB_ORDER_COMPLETED" : "LAB_RESULT_RECORDED",
+                "laboratory",
+                "LabOrder",
+                event.labOrderId(),
+                event.recordedBy(),
+                null,
+                event.recordedAt(),
+                "Lab result recorded for order item: " + event.labOrderItemId() +
+                        ". Order completed: " + event.orderCompleted()
+        );
+    }
+
+    @ApplicationModuleListener
+    public void onUserRoleAssigned(UserRoleAssignedEvent event) {
+        auditService.record(
+                "USER_ROLE_ASSIGNED",
+                "identity",
+                "User",
+                event.userId(),
+                event.assignedBy(),
+                null,
+                event.assignedAt(),
+                "Role " + event.role() + " assigned to user: " + event.username()
+        );
+    }
+
+    @ApplicationModuleListener
+    public void onUserActivated(UserActivatedEvent event) {
+        auditService.record(
+                "USER_ACTIVATED",
+                "identity",
+                "User",
+                event.userId(),
+                event.activatedBy(),
+                null,
+                event.activatedAt(),
+                "User activated: " + event.username()
+        );
+    }
+
+    @ApplicationModuleListener
+    public void onUserDeactivated(UserDeactivatedEvent event) {
+        auditService.record(
+                "USER_DEACTIVATED",
+                "identity",
+                "User",
+                event.userId(),
+                event.deactivatedBy(),
+                null,
+                event.deactivatedAt(),
+                "User deactivated: " + event.username()
+        );
+    }
+
+    @ApplicationModuleListener
+    public void onUserPasswordReset(UserPasswordResetEvent event) {
+        auditService.record(
+                "USER_PASSWORD_RESET",
+                "identity",
+                "User",
+                event.userId(),
+                event.resetBy(),
+                null,
+                event.resetAt(),
+                "Password reset for user: " + event.username()
+        );
+    }
+
 }

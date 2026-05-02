@@ -1,6 +1,6 @@
 package com.custard.ehr.vitals.presentation;
 
-import com.custard.ehr.shared.infrastruture.web.ApiResponse;
+import com.custard.ehr.shared.infrastruture.web.AppApiResponse;
 import com.custard.ehr.vitals.application.dto.RecordVitalsRequest;
 import com.custard.ehr.vitals.application.dto.VitalsResponse;
 import com.custard.ehr.vitals.application.service.VitalsService;
@@ -26,7 +26,7 @@ public class VitalsController {
     }
 
     @PostMapping
-    public ApiResponse<VitalsResponse> recordVitals(
+    public AppApiResponse<VitalsResponse> recordVitals(
             @Valid @RequestBody RecordVitalsRequest request
     ) {
         log.info(
@@ -34,39 +34,39 @@ public class VitalsController {
                 request.encounterId()
         );
 
-        return ApiResponse.success(
+        return AppApiResponse.success(
                 "Vitals recorded successfully",
                 vitalsService.recordVitals(request)
         );
     }
 
     @GetMapping("/{id}")
-    public ApiResponse<VitalsResponse> getById(@PathVariable UUID id) {
+    public AppApiResponse<VitalsResponse> getById(@PathVariable UUID id) {
         log.debug("Received request to fetch vitals ID: {}", id);
-        return ApiResponse.success(vitalsService.getById(id));
+        return AppApiResponse.success(vitalsService.getById(id));
     }
 
     @GetMapping("/encounter/{encounterId}/latest")
-    public ApiResponse<VitalsResponse> getLatestByEncounter(
+    public AppApiResponse<VitalsResponse> getLatestByEncounter(
             @PathVariable UUID encounterId
     ) {
         log.debug("Received request to fetch latest vitals for encounter ID: {}", encounterId);
-        return ApiResponse.success(vitalsService.getLatestByEncounter(encounterId));
+        return AppApiResponse.success(vitalsService.getLatestByEncounter(encounterId));
     }
 
     @GetMapping("/encounter/{encounterId}")
-    public ApiResponse<List<VitalsResponse>> getByEncounter(
+    public AppApiResponse<List<VitalsResponse>> getByEncounter(
             @PathVariable UUID encounterId
     ) {
         log.debug("Received request to fetch vitals for encounter ID: {}", encounterId);
-        return ApiResponse.success(vitalsService.getByEncounter(encounterId));
+        return AppApiResponse.success(vitalsService.getByEncounter(encounterId));
     }
 
     @GetMapping("/patient/{patientId}")
-    public ApiResponse<List<VitalsResponse>> getByPatient(
+    public AppApiResponse<List<VitalsResponse>> getByPatient(
             @PathVariable UUID patientId
     ) {
         log.debug("Received request to fetch vitals history for patient ID: {}", patientId);
-        return ApiResponse.success(vitalsService.getByPatient(patientId));
+        return AppApiResponse.success(vitalsService.getByPatient(patientId));
     }
 }

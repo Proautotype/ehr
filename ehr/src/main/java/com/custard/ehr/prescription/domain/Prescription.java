@@ -117,6 +117,14 @@ public class Prescription extends AuditableEntity {
         this.status = PrescriptionStatus.DISPENSED;
     }
 
+    public void markPartiallyDispensed() {
+        if (this.status != PrescriptionStatus.SENT_TO_PHARMACY) {
+            throw new BusinessException("Only prescriptions sent to pharmacy can be partially dispensed");
+        }
+
+        this.status = PrescriptionStatus.PARTIALLY_DISPENSED;
+    }
+
     public void cancel() {
         if (this.status == PrescriptionStatus.DISPENSED) {
             throw new BusinessException("Dispensed prescription cannot be cancelled");
