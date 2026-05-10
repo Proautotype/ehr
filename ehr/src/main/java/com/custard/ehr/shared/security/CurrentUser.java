@@ -1,6 +1,9 @@
 package com.custard.ehr.shared.security;
 
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 
+import java.util.Collection;
 import java.util.Set;
 import java.util.UUID;
 
@@ -9,7 +12,8 @@ public record CurrentUser(
         String username,
         String fullName,
         Set<Role> roles,
-        Set<Permission> permissions
+        Set<Permission> permissions,
+        Collection<? extends GrantedAuthority> authorities
 ) {
 
     public boolean hasRole(Role role) {
@@ -20,7 +24,4 @@ public record CurrentUser(
         return permissions != null && permissions.contains(permission);
     }
 
-    public boolean isAdmin() {
-        return hasRole(Role.ADMIN);
-    }
 }

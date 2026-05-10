@@ -1,0 +1,66 @@
+databaseChangeLog:
+
+  - changeSet:
+      id: 2026-05-02-009-drug-constraints
+      author: custard
+      changes:
+        - addUniqueConstraint:
+            tableName: drugs
+            columnNames: code
+            constraintName: uq_drugs_code
+
+  - changeSet:
+      id: 2026-05-02-010-seed-drugs
+      author: custard
+      changes:
+        - sql:
+            splitStatements: false
+            sql: |
+
+              INSERT INTO drugs (id, name, code, description, unit, active, created_at, updated_at)
+              VALUES
+
+              -- ANALGESICS
+              (gen_random_uuid(), 'Paracetamol 500mg', 'PARA500', 'Pain reliever and fever reducer', 'TABLET', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+              (gen_random_uuid(), 'Ibuprofen 400mg', 'IBU400', 'NSAID for pain and inflammation', 'TABLET', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+              -- ANTIBIOTICS
+              (gen_random_uuid(), 'Amoxicillin 500mg', 'AMOX500', 'Broad-spectrum antibiotic', 'CAPSULE', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+              (gen_random_uuid(), 'Azithromycin 250mg', 'AZI250', 'Macrolide antibiotic', 'TABLET', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+              (gen_random_uuid(), 'Ciprofloxacin 500mg', 'CIPRO500', 'Fluoroquinolone antibiotic', 'TABLET', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+              -- ANTIMALARIALS
+              (gen_random_uuid(), 'Artemether-Lumefantrine', 'ALU', 'First-line malaria treatment', 'TABLET', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+              (gen_random_uuid(), 'Quinine Sulphate', 'QUININE', 'Malaria treatment (second line)', 'TABLET', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+              -- ANTIHYPERTENSIVES
+              (gen_random_uuid(), 'Amlodipine 5mg', 'AMLO5', 'Calcium channel blocker for hypertension', 'TABLET', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+              (gen_random_uuid(), 'Lisinopril 10mg', 'LISI10', 'ACE inhibitor for hypertension', 'TABLET', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+              -- DIABETES
+              (gen_random_uuid(), 'Metformin 500mg', 'MET500', 'Oral hypoglycemic agent', 'TABLET', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+              (gen_random_uuid(), 'Insulin (Regular)', 'INS_REG', 'Short-acting insulin', 'INJECTION', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+              -- GASTROINTESTINAL
+              (gen_random_uuid(), 'Omeprazole 20mg', 'OME20', 'Proton pump inhibitor', 'CAPSULE', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+              (gen_random_uuid(), 'Loperamide', 'LOP', 'Anti-diarrheal medication', 'TABLET', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+              -- RESPIRATORY
+              (gen_random_uuid(), 'Salbutamol Inhaler', 'SALB_INH', 'Bronchodilator for asthma', 'INHALER', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+              -- ANTIALlergy
+              (gen_random_uuid(), 'Cetirizine 10mg', 'CET10', 'Antihistamine', 'TABLET', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+              -- PAEDIATRIC
+              (gen_random_uuid(), 'Paracetamol Syrup', 'PARA_SYR', 'Paediatric fever and pain relief', 'SYRUP', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+              -- EMERGENCY
+              (gen_random_uuid(), 'Adrenaline Injection', 'ADR_INJ', 'Emergency anaphylaxis treatment', 'INJECTION', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+
+              ON CONFLICT (code) DO UPDATE
+              SET
+                name = EXCLUDED.name,
+                description = EXCLUDED.description,
+                unit = EXCLUDED.unit,
+                active = EXCLUDED.active,
+                updated_at = CURRENT_TIMESTAMP;

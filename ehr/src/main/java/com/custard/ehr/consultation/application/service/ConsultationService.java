@@ -5,6 +5,7 @@ import com.custard.ehr.consultation.application.dto.CreateConsultationRequest;
 import com.custard.ehr.consultation.application.ports.ConsultationRepository;
 import com.custard.ehr.consultation.domain.ConsultationNote;
 import com.custard.ehr.encounter.EncounterIdentifierVerifier;
+import com.custard.ehr.encounter.EncounterLookupView;
 import com.custard.ehr.shared.events.ConsultationRecordedEvent;
 import com.custard.ehr.shared.exception.BusinessException;
 import com.custard.ehr.shared.exception.NotFoundException;

@@ -1,6 +1,7 @@
 package com.custard.ehr.drug;
 
 import com.custard.ehr.drug.application.ports.DrugRepository;
+import com.custard.ehr.drug.domain.Drug;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +33,7 @@ class DrugLookupService implements DrugIdentifierVerifier {
         log.debug("Looking up active drug: {}", drugId);
 
         return drugRepository.findById(drugId)
-                .filter(drug -> drug.isActive())
+                .filter(Drug::isActive)
                 .map(drug -> new DrugLookupView(
                         drug.getId(),
                         drug.getName(),

@@ -1,0 +1,11 @@
+name: ehr
+services:
+  database:
+    container_name: ehr
+    image: 'postgres:latest'
+    environment:
+      - 'POSTGRES_PASSWORD=admin'
+      - 'POSTGRES_DB=ehr'
+      - 'POSTGRES_USER=admin'
+    ports:
+      - '5432:5432'

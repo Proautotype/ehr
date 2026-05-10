@@ -1,7 +1,7 @@
 package com.custard.ehr.identity.infrastructure;
 
 import com.custard.ehr.identity.application.ports.UserRepository;
-import com.custard.ehr.identity.domain.User;
+import com.custard.ehr.identity.domain.AppUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -9,11 +9,11 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface JpaUserRepository extends JpaRepository<User, UUID>, UserRepository {
+public interface JpaUserRepository extends JpaRepository<AppUser, UUID>, UserRepository {
 
-    Optional<User> findByUsername(String username);
+    Optional<AppUser> findByUsername(String username);
 
-    Optional<User> findByEmail(String email);
+    Optional<AppUser> findByEmail(String email);
 
     boolean existsByUsername(String username);
 

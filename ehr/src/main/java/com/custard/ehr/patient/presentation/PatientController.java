@@ -1,9 +1,11 @@
 package com.custard.ehr.patient.presentation;
 
+import com.custard.ehr.patient.application.dto.UpdatePatientRequest;
 import com.custard.ehr.patient.application.service.PatientService;
 import com.custard.ehr.patient.application.dto.AddAllergyRequest;
 import com.custard.ehr.patient.application.dto.PatientResponse;
 import com.custard.ehr.patient.application.dto.RegisterPatientRequest;
+import com.custard.ehr.shared.domain.PageResultDto;
 import com.custard.ehr.shared.infrastruture.web.AppApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -13,6 +15,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,6 +28,7 @@ import java.util.UUID;
 @SecurityRequirement(name = "bearerAuth")
 public class PatientController {
 
+    private static final Logger log = LoggerFactory.getLogger(PatientController.class);
     private final PatientService patientService;
 
     public PatientController(PatientService patientService) {
@@ -35,7 +40,7 @@ public class PatientController {
             summary = "Register patient",
             description = "Registers a new patient in the system"
     )
-    @ApiResponses({
+    @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
                     description = "Patient registered successfully",
@@ -59,12 +64,44 @@ public class PatientController {
         );
     }
 
+    @PatchMapping("/{id}")
+    @Operation(
+            summary = "Update patient",
+            description = "Updates existing patient details in the system"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Patient details updated successfully",
+                    content = @Content(schema = @Schema(implementation = PatientResponse.class))
+            ),
+            @ApiResponse(responseCode = "400", description = "Invalid request payload"),
+            @ApiResponse(responseCode = "403", description = "Forbidden")
+    })
+    public AppApiResponse<PatientResponse> update(
+            @PathVariable("id") UUID id
+            ,
+            @Valid
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Patient update payload",
+                    required = true,
+                    content = @Content(schema = @Schema(implementation = UpdatePatientRequest.class))
+            )
+            @RequestBody UpdatePatientRequest request
+    ) {
+        log.info("Received request to update patient with id {} and rq-dt \n{}", id, request);
+        PatientResponse update = patientService.update(id, request);
+        return AppApiResponse.success(
+                "Patient details updated successfully", update
+        );
+    }
+
     @GetMapping("/{id}")
     @Operation(
             summary = "Get patient by ID",
             description = "Fetch a patient by their unique identifier"
     )
-    @ApiResponses({
+    @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
                     description = "Patient retrieved successfully",
@@ -82,7 +119,7 @@ public class PatientController {
             summary = "Get patient by patient number",
             description = "Fetch a patient using their unique patient number"
     )
-    @ApiResponses({
+    @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
                     description = "Patient retrieved successfully",
@@ -102,7 +139,7 @@ public class PatientController {
             summary = "Search patients",
             description = "Search patients by name, number, or keyword"
     )
-    @ApiResponses({
+    @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
                     description = "Search results retrieved successfully",
@@ -111,10 +148,15 @@ public class PatientController {
             @ApiResponse(responseCode = "400", description = "Invalid search query"),
             @ApiResponse(responseCode = "403", description = "Forbidden")
     })
-    public AppApiResponse<List<PatientResponse>> search(
-            @RequestParam String query
+    public AppApiResponse<PageResultDto<PatientResponse>> pagedSearch(
+            @RequestParam(required = false) String query,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy
     ) {
-        return AppApiResponse.success(patientService.search(query));
+        log.info("Patient search parameters q {}, p {}, s {}", query, page, size);
+        var searchResult = patientService.search(query, size, page, sortBy);
+        return AppApiResponse.success(searchResult);
     }
 
     @PostMapping("/{patientId}/allergies")
@@ -122,7 +164,7 @@ public class PatientController {
             summary = "Add patient allergy",
             description = "Adds an allergy record to a patient profile"
     )
-    @ApiResponses({
+    @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
                     description = "Allergy added successfully",

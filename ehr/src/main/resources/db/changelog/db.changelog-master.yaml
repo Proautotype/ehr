@@ -1,0 +1,13 @@
+databaseChangeLog:
+#  - include:
+#      file: db/changelog/changes/000-role-permission.yaml
+  - include:
+      file: db/changelog/changes/001-role-permissions.yaml
+  - include:
+      file: db/changelog/changes/002-seed-drugs.yaml
+  - include:
+      file: db/changelog/changes/003-seed-users-rbac.yaml
+  - include:
+      file: db/changelog/changes/004-seed-stock-items.yaml
+  - include:
+      file: db/changelog/changes/005-seed-lab-tests.yaml

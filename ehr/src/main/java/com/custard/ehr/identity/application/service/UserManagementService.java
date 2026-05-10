@@ -5,15 +5,10 @@ import com.custard.ehr.identity.application.dto.CreateStaffUserRequest;
 import com.custard.ehr.identity.application.dto.ResetPasswordRequest;
 import com.custard.ehr.identity.application.dto.UserResponse;
 import com.custard.ehr.identity.application.ports.AppRoleRepository;
-import com.custard.ehr.identity.application.ports.PasswordHasher;
 import com.custard.ehr.identity.application.ports.UserRepository;
 import com.custard.ehr.identity.domain.AppRole;
-import com.custard.ehr.identity.domain.User;
-import com.custard.ehr.shared.events.UserActivatedEvent;
-import com.custard.ehr.shared.events.UserDeactivatedEvent;
-import com.custard.ehr.shared.events.UserPasswordResetEvent;
-import com.custard.ehr.shared.events.UserRegisteredEvent;
-import com.custard.ehr.shared.events.UserRoleAssignedEvent;
+import com.custard.ehr.identity.domain.AppUser;
+import com.custard.ehr.shared.events.*;
 import com.custard.ehr.shared.exception.BusinessException;
 import com.custard.ehr.shared.exception.NotFoundException;
 import com.custard.ehr.shared.security.SecurityUtils;
@@ -67,7 +62,7 @@ public class UserManagementService {
         AppRole role = appRoleRepository.findByName(request.role())
                 .orElseThrow(() -> new BusinessException("Role has not been initialized: " + request.role()));
 
-        User user = new User(
+        AppUser user = new AppUser(
                 request.fullName(),
                 request.username(),
                 request.email(),
@@ -76,7 +71,7 @@ public class UserManagementService {
 
         user.assignRole(role);
 
-        User saved = userRepository.save(user);
+        AppUser saved = userRepository.save(user);
         UUID actorId = SecurityUtils.requireCurrentUserId();
 
         eventPublisher.publishEvent(
@@ -107,14 +102,14 @@ public class UserManagementService {
     public UserResponse assignRole(UUID userId, AssignRoleRequest request) {
         log.info("Assigning role {} to user {}", request.role(), userId);
 
-        User user = getUserOrThrow(userId);
+        AppUser user = getUserOrThrow(userId);
 
         AppRole role = appRoleRepository.findByName(request.role())
                 .orElseThrow(() -> new BusinessException("Role has not been initialized: " + request.role()));
 
         user.assignRole(role);
 
-        User saved = userRepository.save(user);
+        AppUser saved = userRepository.save(user);
 
         eventPublisher.publishEvent(
                 new UserRoleAssignedEvent(
@@ -133,10 +128,10 @@ public class UserManagementService {
     public UserResponse activate(UUID userId) {
         log.info("Activating user {}", userId);
 
-        User user = getUserOrThrow(userId);
+        AppUser user = getUserOrThrow(userId);
         user.activate();
 
-        User saved = userRepository.save(user);
+        AppUser saved = userRepository.save(user);
 
         eventPublisher.publishEvent(
                 new UserActivatedEvent(
@@ -154,10 +149,10 @@ public class UserManagementService {
     public UserResponse deactivate(UUID userId) {
         log.info("Deactivating user {}", userId);
 
-        User user = getUserOrThrow(userId);
+        AppUser user = getUserOrThrow(userId);
         user.deactivate();
 
-        User saved = userRepository.save(user);
+        AppUser saved = userRepository.save(user);
 
         eventPublisher.publishEvent(
                 new UserDeactivatedEvent(
@@ -175,10 +170,10 @@ public class UserManagementService {
     public void resetPassword(UUID userId, ResetPasswordRequest request) {
         log.info("Resetting password for user {}", userId);
 
-        User user = getUserOrThrow(userId);
+        AppUser user = getUserOrThrow(userId);
         user.resetPassword(passwordEncoder.encode(request.newPassword()));
 
-        User saved = userRepository.save(user);
+        AppUser saved = userRepository.save(user);
 
         eventPublisher.publishEvent(
                 new UserPasswordResetEvent(
@@ -216,7 +211,7 @@ public class UserManagementService {
                 .toList();
     }
 
-    private User getUserOrThrow(UUID userId) {
+    private AppUser getUserOrThrow(UUID userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> {
                     log.warn("User lookup failed. User {} not found", userId);

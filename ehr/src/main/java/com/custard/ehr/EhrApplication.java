@@ -9,7 +9,8 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @EnableAsync
 @ConfigurationPropertiesScan
 public class EhrApplication {
-    public void main(String [] args) {
+
+    public static void main(String[] args) {
         SpringApplication.run(EhrApplication.class, args);
     }
 }

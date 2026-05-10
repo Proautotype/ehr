@@ -2,6 +2,7 @@ package com.custard.ehr.drug.domain;
 
 import com.custard.ehr.shared.domain.AuditableEntity;
 import jakarta.persistence.*;
+import lombok.Getter;
 
 import java.util.UUID;
 
@@ -12,6 +13,7 @@ import java.util.UUID;
                 @Index(name = "idx_drug_name", columnList = "name")
         }
 )
+@Getter
 public class Drug extends AuditableEntity {
 
     @Id
@@ -25,6 +27,10 @@ public class Drug extends AuditableEntity {
     private String form; // tablet, syrup, injection
 
     private boolean active = true;
+
+    private String description;
+    private String code;
+    private String unit;
 
     protected Drug() {}
 

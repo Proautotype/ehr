@@ -2,6 +2,7 @@ package com.custard.ehr.drug.presentation;
 
 import com.custard.ehr.drug.application.dto.DrugResponse;
 import com.custard.ehr.drug.application.service.DrugService;
+import com.custard.ehr.shared.domain.PageResultDto;
 import com.custard.ehr.shared.infrastruture.web.AppApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -47,9 +48,14 @@ public class DrugController {
             @ApiResponse(responseCode = "400", description = "Invalid search query"),
             @ApiResponse(responseCode = "403", description = "Forbidden")
     })
-    public AppApiResponse<List<DrugResponse>> search(@RequestParam String query) {
-        log.info("Drug search request: {}", query);
-        return AppApiResponse.success(drugService.search(query));
+    public AppApiResponse<PageResultDto<DrugResponse>> search(
+            @RequestParam(value = "query") String query,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "name") String sortBy
+    ) {
+        log.info("Drug search parameters q {}, p {}, s {}", query,  page, size);
+        return AppApiResponse.success(drugService.search(query, size, page, sortBy));
     }
 
     @GetMapping("/{id}")

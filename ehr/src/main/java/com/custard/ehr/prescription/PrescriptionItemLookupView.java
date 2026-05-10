@@ -8,6 +8,6 @@ public record PrescriptionItemLookupView(
         String drugName,
         String strength,
         String form,
-        Integer quantity
+        Integer prescribedQuantity
 ) {
 }

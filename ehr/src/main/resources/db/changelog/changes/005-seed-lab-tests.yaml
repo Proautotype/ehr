@@ -1,0 +1,98 @@
+databaseChangeLog:
+
+  - changeSet:
+      id: 2026-05-02-030-seed-lab-tests
+      author: custard
+      changes:
+        - sql:
+            splitStatements: false
+            sql: |
+
+              INSERT INTO lab_tests (
+                  id,
+                  name,
+                  code,
+                  description,
+                  price,
+                  active,
+                  created_at,
+                  updated_at
+              )
+              VALUES
+
+              -- HEMATOLOGY
+              (gen_random_uuid(), 'Full Blood Count', 'FBC', 'Complete blood count including RBC, WBC, hemoglobin and platelets', 50.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+              (gen_random_uuid(), 'Hemoglobin', 'HB', 'Measures hemoglobin level', 20.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+              (gen_random_uuid(), 'Packed Cell Volume', 'PCV', 'Measures proportion of red blood cells in blood', 20.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+              (gen_random_uuid(), 'Erythrocyte Sedimentation Rate', 'ESR', 'Inflammation marker test', 30.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+              (gen_random_uuid(), 'Blood Grouping and Rh Factor', 'BLOOD_GROUP_RH', 'Determines ABO blood group and Rh factor', 35.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+              (gen_random_uuid(), 'Sickling Test', 'SICKLING', 'Screening test for sickle cell disorder', 30.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+              (gen_random_uuid(), 'G6PD Test', 'G6PD', 'Screens for glucose-6-phosphate dehydrogenase deficiency', 70.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+              -- MALARIA / PARASITOLOGY
+              (gen_random_uuid(), 'Malaria Parasite Test', 'MPS', 'Microscopy test for malaria parasites', 30.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+              (gen_random_uuid(), 'Malaria Rapid Diagnostic Test', 'MRDT', 'Rapid antigen test for malaria infection', 25.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+              (gen_random_uuid(), 'Stool Routine Examination', 'STOOL_RE', 'Stool examination for parasites, ova and cysts', 35.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+              (gen_random_uuid(), 'Stool Occult Blood Test', 'STOOL_OB', 'Detects hidden blood in stool', 40.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+              -- URINE
+              (gen_random_uuid(), 'Urine Routine Examination', 'URINE_RE', 'Routine urine analysis including appearance, protein, glucose and microscopy', 30.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+              (gen_random_uuid(), 'Urine Pregnancy Test', 'UPT', 'Detects pregnancy hormone in urine', 25.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+              (gen_random_uuid(), 'Urine Culture and Sensitivity', 'URINE_CS', 'Identifies urinary pathogens and antibiotic sensitivity', 120.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+              -- BIOCHEMISTRY / DIABETES
+              (gen_random_uuid(), 'Blood Glucose Fasting', 'FBS', 'Measures fasting blood sugar level', 25.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+              (gen_random_uuid(), 'Blood Glucose Random', 'RBS', 'Measures random blood sugar level', 25.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+              (gen_random_uuid(), 'HbA1c', 'HBA1C', 'Measures average blood glucose over approximately three months', 80.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+              (gen_random_uuid(), 'Lipid Profile', 'LIPID_PROFILE', 'Measures cholesterol, triglycerides, HDL and LDL', 90.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+              -- RENAL FUNCTION / ELECTROLYTES
+              (gen_random_uuid(), 'Urea', 'UREA', 'Measures blood urea level', 35.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+              (gen_random_uuid(), 'Creatinine', 'CREATININE', 'Measures kidney filtration function', 35.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+              (gen_random_uuid(), 'Urea Electrolytes and Creatinine', 'UEC', 'Assesses kidney function and electrolyte balance', 100.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+              (gen_random_uuid(), 'Sodium', 'NA', 'Measures serum sodium level', 30.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+              (gen_random_uuid(), 'Potassium', 'K', 'Measures serum potassium level', 30.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+              (gen_random_uuid(), 'Chloride', 'CL', 'Measures serum chloride level', 30.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+              (gen_random_uuid(), 'Calcium', 'CALCIUM', 'Measures serum calcium level', 40.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+              -- LIVER FUNCTION
+              (gen_random_uuid(), 'Liver Function Test', 'LFT', 'Panel for liver enzymes, bilirubin and proteins', 90.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+              (gen_random_uuid(), 'ALT', 'ALT', 'Alanine aminotransferase liver enzyme test', 35.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+              (gen_random_uuid(), 'AST', 'AST', 'Aspartate aminotransferase liver enzyme test', 35.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+              (gen_random_uuid(), 'Bilirubin Total and Direct', 'BILIRUBIN', 'Measures total and direct bilirubin', 45.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+              -- CARDIAC / INFLAMMATION
+              (gen_random_uuid(), 'Troponin I', 'TROP_I', 'Cardiac marker for myocardial injury', 120.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+              (gen_random_uuid(), 'C-Reactive Protein', 'CRP', 'Inflammation marker test', 80.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+              -- MICROBIOLOGY
+              (gen_random_uuid(), 'Blood Culture and Sensitivity', 'BLOOD_CS', 'Detects bloodstream infection and antibiotic sensitivity', 180.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+              (gen_random_uuid(), 'Wound Swab Culture and Sensitivity', 'WOUND_CS', 'Culture and sensitivity test for wound infections', 130.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+              (gen_random_uuid(), 'High Vaginal Swab Culture', 'HVS_CS', 'Culture and sensitivity test for vaginal infections', 130.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+              (gen_random_uuid(), 'Throat Swab Culture', 'THROAT_CS', 'Culture test for throat infections', 120.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+              -- INFECTIOUS DISEASE
+              (gen_random_uuid(), 'HIV 1 and 2 Screening', 'HIV_1_2', 'Screening test for HIV 1 and HIV 2 antibodies', 50.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+              (gen_random_uuid(), 'Hepatitis B Surface Antigen', 'HBSAG', 'Screening test for hepatitis B infection', 60.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+              (gen_random_uuid(), 'Hepatitis C Antibody', 'HCV_AB', 'Screening test for hepatitis C infection', 70.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+              (gen_random_uuid(), 'Syphilis VDRL', 'VDRL', 'Screening test for syphilis infection', 50.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+              (gen_random_uuid(), 'Typhoid Widal Test', 'WIDAL', 'Serological test for typhoid fever', 40.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+              -- HORMONES / ENDOCRINE
+              (gen_random_uuid(), 'Thyroid Function Test', 'TFT', 'Panel for thyroid hormone assessment', 150.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+              (gen_random_uuid(), 'TSH', 'TSH', 'Thyroid stimulating hormone test', 70.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+              (gen_random_uuid(), 'Free T3', 'FT3', 'Free triiodothyronine test', 70.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+              (gen_random_uuid(), 'Free T4', 'FT4', 'Free thyroxine test', 70.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+              -- COAGULATION
+              (gen_random_uuid(), 'Prothrombin Time', 'PT', 'Assesses blood clotting function', 80.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+              (gen_random_uuid(), 'Activated Partial Thromboplastin Time', 'APTT', 'Assesses intrinsic clotting pathway', 80.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+              (gen_random_uuid(), 'International Normalized Ratio', 'INR', 'Standardized clotting test result', 60.00, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+
+              ON CONFLICT (name) DO UPDATE
+              SET
+                  code = EXCLUDED.code,
+                  description = EXCLUDED.description,
+                  price = EXCLUDED.price,
+                  active = EXCLUDED.active,
+                  updated_at = CURRENT_TIMESTAMP;

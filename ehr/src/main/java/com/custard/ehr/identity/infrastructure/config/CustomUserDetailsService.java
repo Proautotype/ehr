@@ -1,7 +1,7 @@
 package com.custard.ehr.identity.infrastructure.config;
 
 import com.custard.ehr.identity.application.ports.UserRepository;
-import com.custard.ehr.identity.domain.User;
+import com.custard.ehr.identity.domain.AppUser;
 import com.custard.ehr.identity.domain.UserRole;
 import com.custard.ehr.shared.security.Permission;
 import com.custard.ehr.shared.security.Role;
@@ -35,7 +35,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) {
         log.debug("Loading user security details for username: {}", username);
 
-        User user = userRepository.findByUsername(username)
+        AppUser user = userRepository.findByUsername(username)
                 .orElseThrow(() -> {
                     log.warn("Authentication failed. User {} not found", username);
                     return new UsernameNotFoundException("User not found");

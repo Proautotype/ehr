@@ -8,7 +8,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "app_users")
-public class User extends AuditableEntity {
+public class AppUser extends AuditableEntity {
 
     @Id
     @Column(nullable = false, updatable = false)
@@ -32,10 +32,10 @@ public class User extends AuditableEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private final Set<UserRole> roles = new HashSet<>();
 
-    protected User() {
+    protected AppUser() {
     }
 
-    public User(String fullName, String username, String email, String passwordHash) {
+    public AppUser(String fullName, String username, String email, String passwordHash) {
         this.fullName = fullName;
         this.username = username;
         this.email = email;

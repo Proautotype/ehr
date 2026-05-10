@@ -3,17 +3,26 @@ package com.custard.ehr.patient.application.service;
 import com.custard.ehr.patient.application.dto.AddAllergyRequest;
 import com.custard.ehr.patient.application.dto.PatientResponse;
 import com.custard.ehr.patient.application.dto.RegisterPatientRequest;
+import com.custard.ehr.patient.application.dto.UpdatePatientRequest;
+import com.custard.ehr.patient.application.mapper.PatientMapper;
 import com.custard.ehr.patient.application.ports.PatientRepository;
 import com.custard.ehr.patient.domain.Patient;
 import com.custard.ehr.patient.domain.PatientNumber;
+import com.custard.ehr.patient.infrastructure.PatientSpecifications;
+import com.custard.ehr.shared.domain.PageResultDto;
 import com.custard.ehr.shared.events.PatientRegisteredEvent;
 import com.custard.ehr.shared.exception.BusinessException;
 import com.custard.ehr.shared.exception.NotFoundException;
 import com.custard.ehr.shared.security.SecurityUtils;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j; // Added
+import org.springframework.data.domain.Page;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,13 +39,16 @@ public class PatientService {
 
     private final PatientRepository patientRepository;
     private final ApplicationEventPublisher eventPublisher;
+    private final PatientMapper patientMapper;
 
     public PatientService(
             PatientRepository patientRepository,
-            ApplicationEventPublisher eventPublisher
+            ApplicationEventPublisher eventPublisher,
+            PatientMapper patientMapper
     ) {
         this.patientRepository = patientRepository;
         this.eventPublisher = eventPublisher;
+        this.patientMapper = patientMapper;
     }
 
     @Transactional
@@ -99,17 +111,28 @@ public class PatientService {
                 });
     }
 
-    @Transactional(readOnly = true)
-    public List<PatientResponse> search(String query) {
-        log.debug("Searching patients with query: '{}'", query);
-        List<PatientResponse> results = patientRepository
-                .findTop20ByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(query, query)
-                .stream()
-                .map(PatientResponse::from)
-                .toList();
 
-        log.debug("Search returned {} results", results.size());
-        return results;
+    public PageResultDto<PatientResponse> search(String query, int size, int page, String sortBy) {
+        log.debug("Searching patients. query={}, page={}, size={}", query, page, size);
+
+        int safePage = Math.max(page, 0);
+        int safeSize = Math.min(Math.max(size, 1), 100);
+
+        var pageable = PageRequest.of(
+                safePage,
+                safeSize,
+                Sort.by(Sort.Direction.DESC, sortBy.isBlank() ? "createdAt" : sortBy)
+        );
+
+        var specification = PatientSpecifications.activeOnly()
+                .and(PatientSpecifications.search(query));
+
+        var result = patientRepository.findAll(specification, pageable)
+                .map(PatientResponse::from);
+
+        log.info("Search results {} ", result.getContent().size());
+
+        return PageResultDto.from(result);
     }
 
     @Transactional
@@ -142,4 +165,27 @@ public class PatientService {
         log.trace("Generated patient number: {}", num);
         return num;
     }
+
+    public PatientResponse update(UUID patientId, UpdatePatientRequest request) {
+        try {
+            log.info("Patient update request received \n{}", request);
+            Patient patient = patientRepository.findById(patientId).orElseThrow();
+
+            patientMapper.updatePatientFromRequest(request, patient);
+
+            Patient updatedPatient = patientRepository.save(patient);
+            return PatientResponse.from(updatedPatient);
+        } catch (Exception e) {
+            log.error("Error updating patient {}", patientId, e);
+            throw new BusinessException(e.getMessage());
+        }
+    }
+
+    private Patient findAndUpdateFields(UUID patientId, UpdatePatientRequest request) {
+        Patient patient = patientRepository.findById(patientId).orElseThrow();
+
+
+        return patient;
+    }
+
 }

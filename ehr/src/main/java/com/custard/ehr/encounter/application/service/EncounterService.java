@@ -4,6 +4,8 @@ import com.custard.ehr.encounter.application.dto.CreateEncounterRequest;
 import com.custard.ehr.encounter.application.dto.EncounterResponse;
 import com.custard.ehr.encounter.application.ports.EncounterRepository;
 import com.custard.ehr.encounter.domain.*;
+import com.custard.ehr.identity.IdentityLookupService;
+import com.custard.ehr.identity.domain.AppUser;
 import com.custard.ehr.patient.PatientIdentifierVerifier;
 import com.custard.ehr.shared.events.*;
 import com.custard.ehr.shared.exception.BusinessException;
@@ -13,6 +15,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,14 +34,17 @@ public class EncounterService {
     private final EncounterRepository encounterRepository;
     private final ApplicationEventPublisher eventPublisher;
     private final PatientIdentifierVerifier patientVerifier;
+    private final IdentityLookupService identityLookupService;
 
     public EncounterService(
             EncounterRepository encounterRepository,
-            ApplicationEventPublisher eventPublisher, PatientIdentifierVerifier patientVerifier
+            ApplicationEventPublisher eventPublisher,
+            PatientIdentifierVerifier patientVerifier, IdentityLookupService identityLookupService
     ) {
         this.encounterRepository = encounterRepository;
         this.eventPublisher = eventPublisher;
         this.patientVerifier = patientVerifier;
+        this.identityLookupService = identityLookupService;
     }
 
     @Transactional
@@ -48,6 +56,8 @@ public class EncounterService {
             throw new BusinessException("Invalid patient ID");
         }
 
+        log.info("Patient ID {} is valid", request.patientId());
+
         if (encounterRepository.existsByPatientIdAndStatus(
                 request.patientId(),
                 EncounterStatus.ACTIVE
@@ -56,7 +66,19 @@ public class EncounterService {
             throw new BusinessException("Patient already has an active encounter");
         }
 
-        UUID openedBy = SecurityUtils.requireCurrentUserId();
+        log.info("Creating encounter for patient ID: {}", request.patientId());
+
+        var auth = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        log.info("current user found: {}", auth.getUsername());
+
+        AppUser currentUser = identityLookupService.getByUsername(auth.getUsername())
+                .orElseThrow(() -> new NotFoundException("No authenticated user found"));
+
+        UUID openedBy =currentUser.getId();
+
+        log.info("Logged in user ID: {}", openedBy);
+
+
         Encounter encounter = new Encounter(
                 request.patientId(),
                 openedBy,

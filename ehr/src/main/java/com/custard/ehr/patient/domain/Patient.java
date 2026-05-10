@@ -130,4 +130,71 @@ public class Patient extends AuditableEntity {
     public Set<ChronicCondition> getChronicConditions() {
         return chronicConditions;
     }
+
+    public void setChronicConditions(Set<ChronicCondition> chronicConditions) {
+        this.chronicConditions = chronicConditions;
+    }
+
+    public void setAllergies(Set<Allergy> allergies) {
+        this.allergies = allergies;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public void setDateOfBirth(LocalDate dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public void setPatientNumber(PatientNumber patientNumber) {
+        this.patientNumber = patientNumber;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+
+    @Override
+    public String toString() {
+        return "Patient{" +
+                "id=" + id +
+                ", patientNumber=" + patientNumber +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", dateOfBirth=" + dateOfBirth +
+                ", gender='" + gender + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", email='" + email + '\'' +
+                ", address='" + address + '\'' +
+                ", active=" + active +
+                ", allergies=" + allergies +
+                ", chronicConditions=" + chronicConditions +
+                '}';
+    }
 }

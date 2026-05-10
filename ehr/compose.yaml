@@ -1,3 +1,4 @@
+name: ehr
 services:
   postgres:
     image: 'postgres:latest'

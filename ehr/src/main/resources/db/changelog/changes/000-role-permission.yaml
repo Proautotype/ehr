@@ -1,0 +1,19 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2026-05-02-000-identity-unique-constraints
+      author: custard
+      changes:
+        - addUniqueConstraint:
+            tableName: app_roles
+            columnNames: name
+            constraintName: uq_app_roles_name
+
+        - addUniqueConstraint:
+            tableName: app_permissions
+            columnNames: name
+            constraintName: uq_app_permissions_name
+
+        - addUniqueConstraint:
+            tableName: app_role_permissions
+            columnNames: role_id, permission_id
+            constraintName: uq_app_role_permissions_role_permission

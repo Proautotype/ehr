@@ -1,6 +1,9 @@
 package com.custard.ehr.drug.application.ports;
 
 import com.custard.ehr.drug.domain.Drug;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,4 +18,7 @@ public interface DrugRepository {
     Optional<Drug> findByName(String name);
 
     List<Drug> findTop20ByNameContainingIgnoreCase(String name);
+
+    Page<Drug> findAll(Specification<Drug> specification, Pageable pageable);
+
 }

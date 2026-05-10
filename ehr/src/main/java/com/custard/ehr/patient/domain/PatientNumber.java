@@ -20,4 +20,11 @@ public class PatientNumber {
     public String getValue() {
         return value;
     }
+
+    @Override
+    public String toString() {
+        return "PatientNumber{" +
+                "value='" + value + '\'' +
+                '}';
+    }
 }

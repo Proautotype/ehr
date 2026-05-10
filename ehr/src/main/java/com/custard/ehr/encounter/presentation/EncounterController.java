@@ -57,9 +57,10 @@ public class EncounterController {
             @RequestBody CreateEncounterRequest request
     ) {
         log.info("REST request to create encounter for patient: {}", request.patientId());
+        var createEncounterResponse = encounterService.create(request);
         return AppApiResponse.success(
                 "Encounter created successfully",
-                encounterService.create(request)
+                createEncounterResponse
         );
     }
 

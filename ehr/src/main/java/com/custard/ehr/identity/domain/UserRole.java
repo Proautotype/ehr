@@ -17,7 +17,7 @@ public class UserRole  extends AuditableEntity {
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private User user;
+    private AppUser user;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id")
@@ -26,7 +26,7 @@ public class UserRole  extends AuditableEntity {
     protected UserRole() {
     }
 
-    public UserRole(User user, AppRole role) {
+    public UserRole(AppUser user, AppRole role) {
         this.user = user;
         this.role = role;
     }
@@ -35,7 +35,7 @@ public class UserRole  extends AuditableEntity {
         return id;
     }
 
-    public User getUser() {
+    public AppUser getUser() {
         return user;
     }
 

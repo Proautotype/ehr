@@ -1,6 +1,6 @@
 package com.custard.ehr.identity.application.dto;
 
-import com.custard.ehr.identity.domain.User;
+import com.custard.ehr.identity.domain.AppUser;
 
 import java.util.Set;
 import java.util.UUID;
@@ -14,7 +14,7 @@ public record UserResponse(
         boolean active,
         Set<String> roles
 ) {
-    public static UserResponse from(User user) {
+    public static UserResponse from(AppUser user) {
         return new UserResponse(
                 user.getId(),
                 user.getFullName(),

@@ -1,0 +1,189 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2026-05-02-001-enable-pgcrypto
+      author: custard
+      changes:
+        - sql:
+            sql: CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
+  - changeSet:
+      id: 2026-05-02-002-seed-roles
+      author: custard
+      changes:
+        - sql:
+            splitStatements: false
+            sql: |
+              INSERT INTO app_roles (id, name, description, created_at, updated_at)
+              VALUES
+                (gen_random_uuid(), 'ADMIN', 'System administrator with full access', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+                (gen_random_uuid(), 'RECEPTIONIST', 'Handles patient registration and encounter creation', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+                (gen_random_uuid(), 'NURSE', 'Records vitals and supports clinical workflow', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+                (gen_random_uuid(), 'DOCTOR', 'Handles consultations, prescriptions, lab orders, and clinical decisions', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+                (gen_random_uuid(), 'LAB_TECHNICIAN', 'Processes lab orders and records lab results', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+                (gen_random_uuid(), 'PHARMACIST', 'Manages pharmacy stock and dispenses prescriptions', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+                (gen_random_uuid(), 'CASHIER', 'Creates invoices and records payments', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+              ON CONFLICT (name) DO UPDATE
+              SET
+                description = EXCLUDED.description,
+                updated_at = CURRENT_TIMESTAMP;
+
+  - changeSet:
+      id: 2026-05-02-003-seed-permissions
+      author: custard
+      changes:
+        - sql:
+            splitStatements: false
+            sql: |
+              INSERT INTO app_permissions (id, name, description, created_at, updated_at)
+              VALUES
+                (gen_random_uuid(), 'USER_VIEW', 'View system users', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+                (gen_random_uuid(), 'USER_MANAGE', 'Manage system users and roles', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+                (gen_random_uuid(), 'PATIENT_REGISTER', 'Register patients', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+                (gen_random_uuid(), 'PATIENT_VIEW', 'View patient records', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+                (gen_random_uuid(), 'ENCOUNTER_CREATE', 'Open patient encounters', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+                (gen_random_uuid(), 'ENCOUNTER_VIEW', 'View encounters', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+                (gen_random_uuid(), 'ENCOUNTER_COMPLETE', 'Complete encounters', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+                (gen_random_uuid(), 'ENCOUNTER_CANCEL', 'Cancel encounters', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+                (gen_random_uuid(), 'VITALS_RECORD', 'Record patient vitals', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+                (gen_random_uuid(), 'VITALS_VIEW', 'View patient vitals', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+                (gen_random_uuid(), 'CONSULTATION_WRITE', 'Record consultation notes', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+                (gen_random_uuid(), 'CONSULTATION_VIEW', 'View consultation notes', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+                (gen_random_uuid(), 'PRESCRIPTION_CREATE', 'Create prescriptions', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+                (gen_random_uuid(), 'PRESCRIPTION_VIEW', 'View prescriptions', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+                (gen_random_uuid(), 'PRESCRIPTION_CANCEL', 'Cancel prescriptions', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+                (gen_random_uuid(), 'DRUG_VIEW', 'View drug catalog', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+                (gen_random_uuid(), 'DRUG_MANAGE', 'Manage drug catalog', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+                (gen_random_uuid(), 'LAB_TEST_MANAGE', 'Manage lab tests', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+                (gen_random_uuid(), 'LAB_ORDER_CREATE', 'Create lab orders', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+                (gen_random_uuid(), 'LAB_ORDER_VIEW', 'View lab orders', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+                (gen_random_uuid(), 'LAB_RESULT_WRITE', 'Record lab results', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+                (gen_random_uuid(), 'PHARMACY_VIEW', 'View pharmacy queue and records', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+                (gen_random_uuid(), 'PHARMACY_DISPENSE', 'Dispense prescriptions', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+                (gen_random_uuid(), 'STOCK_VIEW', 'View pharmacy stock', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+                (gen_random_uuid(), 'STOCK_MANAGE', 'Manage pharmacy stock', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+                (gen_random_uuid(), 'INVOICE_CREATE', 'Create invoices', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+                (gen_random_uuid(), 'INVOICE_VIEW', 'View invoices', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+                (gen_random_uuid(), 'PAYMENT_RECORD', 'Record payments', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+                (gen_random_uuid(), 'PAYMENT_VIEW', 'View payments', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+                (gen_random_uuid(), 'PAYMENT_WAIVE', 'Waive invoices', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+
+                (gen_random_uuid(), 'AUDIT_VIEW', 'View audit logs', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+              ON CONFLICT (name) DO UPDATE
+              SET
+                description = EXCLUDED.description,
+                updated_at = CURRENT_TIMESTAMP;
+
+  - changeSet:
+      id: 2026-05-02-004-seed-role-permissions
+      author: custard
+      changes:
+        - sql:
+            splitStatements: false
+            sql: |
+              -- ADMIN gets all permissions
+              INSERT INTO app_role_permissions (role_id, permission_id)
+              SELECT r.id, p.id
+              FROM app_roles r
+              CROSS JOIN app_permissions p
+              WHERE r.name = 'ADMIN'
+              ON CONFLICT (role_id, permission_id) DO NOTHING;
+
+              -- RECEPTIONIST
+              INSERT INTO app_role_permissions (role_id, permission_id)
+              SELECT r.id, p.id
+              FROM app_roles r
+              JOIN app_permissions p ON p.name IN (
+                'PATIENT_REGISTER',
+                'PATIENT_VIEW',
+                'ENCOUNTER_CREATE',
+                'ENCOUNTER_VIEW'
+              )
+              WHERE r.name = 'RECEPTIONIST'
+              ON CONFLICT (role_id, permission_id) DO NOTHING;
+
+              -- NURSE
+              INSERT INTO app_role_permissions (role_id, permission_id)
+              SELECT r.id, p.id
+              FROM app_roles r
+              JOIN app_permissions p ON p.name IN (
+                'PATIENT_VIEW',
+                'ENCOUNTER_VIEW',
+                'VITALS_RECORD',
+                'VITALS_VIEW'
+              )
+              WHERE r.name = 'NURSE'
+              ON CONFLICT (role_id, permission_id) DO NOTHING;
+
+              -- DOCTOR
+              INSERT INTO app_role_permissions (role_id, permission_id)
+              SELECT r.id, p.id
+              FROM app_roles r
+              JOIN app_permissions p ON p.name IN (
+                'PATIENT_VIEW',
+                'ENCOUNTER_VIEW',
+                'CONSULTATION_WRITE',
+                'CONSULTATION_VIEW',
+                'PRESCRIPTION_CREATE',
+                'PRESCRIPTION_VIEW',
+                'PRESCRIPTION_CANCEL',
+                'DRUG_VIEW',
+                'LAB_ORDER_CREATE',
+                'LAB_ORDER_VIEW',
+                'VITALS_VIEW'
+              )
+              WHERE r.name = 'DOCTOR'
+              ON CONFLICT (role_id, permission_id) DO NOTHING;
+
+              -- LAB TECHNICIAN
+              INSERT INTO app_role_permissions (role_id, permission_id)
+              SELECT r.id, p.id
+              FROM app_roles r
+              JOIN app_permissions p ON p.name IN (
+                'PATIENT_VIEW',
+                'ENCOUNTER_VIEW',
+                'LAB_ORDER_VIEW',
+                'LAB_RESULT_WRITE'
+              )
+              WHERE r.name = 'LAB_TECHNICIAN'
+              ON CONFLICT (role_id, permission_id) DO NOTHING;
+
+              -- PHARMACIST
+              INSERT INTO app_role_permissions (role_id, permission_id)
+              SELECT r.id, p.id
+              FROM app_roles r
+              JOIN app_permissions p ON p.name IN (
+                'PATIENT_VIEW',
+                'PRESCRIPTION_VIEW',
+                'PHARMACY_VIEW',
+                'PHARMACY_DISPENSE',
+                'STOCK_VIEW',
+                'STOCK_MANAGE',
+                'DRUG_VIEW'
+              )
+              WHERE r.name = 'PHARMACIST'
+              ON CONFLICT (role_id, permission_id) DO NOTHING;
+
+              -- CASHIER
+              INSERT INTO app_role_permissions (role_id, permission_id)
+              SELECT r.id, p.id
+              FROM app_roles r
+              JOIN app_permissions p ON p.name IN (
+                'PATIENT_VIEW',
+                'ENCOUNTER_VIEW',
+                'INVOICE_CREATE',
+                'INVOICE_VIEW',
+                'PAYMENT_RECORD',
+                'PAYMENT_VIEW',
+                'PAYMENT_WAIVE'
+              )
+              WHERE r.name = 'CASHIER'
+              ON CONFLICT (role_id, permission_id) DO NOTHING;

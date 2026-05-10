@@ -1,6 +1,6 @@
-package com.custard.ehr.identity.infrastructure;
+package com.custard.ehr.identity.infrastructure.config;
 
-import com.custard.ehr.identity.domain.User;
+import com.custard.ehr.identity.domain.AppUser;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -29,15 +29,15 @@ public class JwtService {
         this.refreshTokenExpirationMinutes = refreshTokenExpirationMinutes;
     }
 
-    public String generateAccessToken(User user) {
+    public String generateAccessToken(AppUser user) {
         return generateToken(user, "ACCESS", accessTokenExpirationMinutes);
     }
 
-    public String generateRefreshToken(User user) {
+    public String generateRefreshToken(AppUser user) {
         return generateToken(user, "REFRESH", refreshTokenExpirationMinutes);
     }
 
-    private String generateToken(User user, String type, long expirationMinutes) {
+    private String generateToken(AppUser user, String type, long expirationMinutes) {
         Instant now = Instant.now();
 
         return Jwts.builder()
@@ -60,6 +60,13 @@ public class JwtService {
 
         return claims.getSubject().equals(username)
                 && "ACCESS".equals(claims.get("type", String.class))
+                && claims.getExpiration().after(new Date());
+    }
+
+    public boolean isValid(String token, String username) {
+        Claims claims = extractClaims(token);
+
+        return claims.getSubject().equals(username)
                 && claims.getExpiration().after(new Date());
     }
 

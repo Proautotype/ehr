@@ -3,6 +3,9 @@ package com.custard.ehr.identity.domain;
 import com.custard.ehr.shared.domain.AuditableEntity;
 import com.custard.ehr.shared.security.Role;
 import jakarta.persistence.*;
+
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -19,6 +22,20 @@ public class AppRole extends AuditableEntity {
 
     @Column(length = 500)
     private String description;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "app_role_permissions",
+            joinColumns = @JoinColumn(name = "role_id"),
+            inverseJoinColumns = @JoinColumn(name = "permission_id"),
+            uniqueConstraints = {
+                    @UniqueConstraint(
+                            name = "uq_app_role_permissions_role_permission",
+                            columnNames = {"role_id", "permission_id"}
+                    )
+            }
+    )
+    private Set<AppPermission> permissions = new HashSet<>();
 
     protected AppRole() {
     }

@@ -92,7 +92,7 @@ public class LabTestController {
             @ApiResponse(responseCode = "400", description = "Invalid search query"),
             @ApiResponse(responseCode = "403", description = "Forbidden")
     })
-    public AppApiResponse<List<LabTestResponse>> search(@RequestParam String query) {
+    public AppApiResponse<List<LabTestResponse>> search(@RequestParam("q") String query) {
         return AppApiResponse.success(labTestService.search(query));
     }
 }

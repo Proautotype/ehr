@@ -7,6 +7,7 @@ public record AuthResponse(
         String username,
         String fullName,
         String accessToken,
+        String refreshToken,
         String tokenType,
         String message
 ) {

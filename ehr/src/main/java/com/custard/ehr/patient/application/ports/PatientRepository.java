@@ -1,6 +1,10 @@
 package com.custard.ehr.patient.application.ports;
 
 import com.custard.ehr.patient.domain.Patient;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+
 
 import java.util.List;
 import java.util.Optional;
@@ -20,4 +24,7 @@ public interface PatientRepository {
             String firstName,
             String lastName
     );
+
+    Page<Patient> findAll(Specification<Patient> specification, Pageable pageable);
+
 }

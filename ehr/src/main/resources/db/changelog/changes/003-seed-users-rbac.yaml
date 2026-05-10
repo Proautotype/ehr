@@ -1,0 +1,172 @@
+databaseChangeLog:
+
+  # --------------------------------------------------
+  # SEED DEFAULT USERS (ONE PER ROLE)
+  # --------------------------------------------------
+
+  - changeSet:
+      id: 2026-05-02-005-seed-users
+      author: custard
+      changes:
+        - sql:
+            splitStatements: false
+            sql: |
+
+              -- ADMIN
+              INSERT INTO app_users (id, full_name, username, email, password_hash, active, created_at, updated_at)
+              VALUES (
+                gen_random_uuid(),
+                'System Administrator',
+                'admin',
+                'admin@custard.local',
+                '$2a$10$7QJc6v9X0nqz6l7g6X1ZeeZCw3XhV7g0q8Yq5Y6yV3Qp2b1Yk9KkK', -- password: admin123
+                true,
+                CURRENT_TIMESTAMP,
+                CURRENT_TIMESTAMP
+              )
+              ON CONFLICT (username) DO NOTHING;
+
+              -- RECEPTIONIST
+              INSERT INTO app_users (id, full_name, username, email, password_hash, active, created_at, updated_at)
+              VALUES (
+                gen_random_uuid(),
+                'Front Desk Reception',
+                'receptionist',
+                'reception@custard.local',
+                '$2a$10$7QJc6v9X0nqz6l7g6X1ZeeZCw3XhV7g0q8Yq5Y6yV3Qp2b1Yk9KkK',
+                true,
+                CURRENT_TIMESTAMP,
+                CURRENT_TIMESTAMP
+              )
+              ON CONFLICT (username) DO NOTHING;
+
+              -- NURSE
+              INSERT INTO app_users (id, full_name, username, email, password_hash, active, created_at, updated_at)
+              VALUES (
+                gen_random_uuid(),
+                'Ward Nurse',
+                'nurse',
+                'nurse@custard.local',
+                '$2a$10$7QJc6v9X0nqz6l7g6X1ZeeZCw3XhV7g0q8Yq5Y6yV3Qp2b1Yk9KkK',
+                true,
+                CURRENT_TIMESTAMP,
+                CURRENT_TIMESTAMP
+              )
+              ON CONFLICT (username) DO NOTHING;
+
+              -- DOCTOR
+              INSERT INTO app_users (id, full_name, username, email, password_hash, active, created_at, updated_at)
+              VALUES (
+                gen_random_uuid(),
+                'Consulting Doctor',
+                'doctor',
+                'doctor@custard.local',
+                '$2a$10$7QJc6v9X0nqz6l7g6X1ZeeZCw3XhV7g0q8Yq5Y6yV3Qp2b1Yk9KkK',
+                true,
+                CURRENT_TIMESTAMP,
+                CURRENT_TIMESTAMP
+              )
+              ON CONFLICT (username) DO NOTHING;
+
+              -- LAB TECH
+              INSERT INTO app_users (id, full_name, username, email, password_hash, active, created_at, updated_at)
+              VALUES (
+                gen_random_uuid(),
+                'Lab Technician',
+                'labtech',
+                'lab@custard.local',
+                '$2a$10$7QJc6v9X0nqz6l7g6X1ZeeZCw3XhV7g0q8Yq5Y6yV3Qp2b1Yk9KkK',
+                true,
+                CURRENT_TIMESTAMP,
+                CURRENT_TIMESTAMP
+              )
+              ON CONFLICT (username) DO NOTHING;
+
+              -- PHARMACIST
+              INSERT INTO app_users (id, full_name, username, email, password_hash, active, created_at, updated_at)
+              VALUES (
+                gen_random_uuid(),
+                'Pharmacist',
+                'pharmacist',
+                'pharmacy@custard.local',
+                '$2a$10$7QJc6v9X0nqz6l7g6X1ZeeZCw3XhV7g0q8Yq5Y6yV3Qp2b1Yk9KkK',
+                true,
+                CURRENT_TIMESTAMP,
+                CURRENT_TIMESTAMP
+              )
+              ON CONFLICT (username) DO NOTHING;
+
+              -- CASHIER
+              INSERT INTO app_users (id, full_name, username, email, password_hash, active, created_at, updated_at)
+              VALUES (
+                gen_random_uuid(),
+                'Billing Cashier',
+                'cashier',
+                'cashier@custard.local',
+                '$2a$10$7QJc6v9X0nqz6l7g6X1ZeeZCw3XhV7g0q8Yq5Y6yV3Qp2b1Yk9KkK',
+                true,
+                CURRENT_TIMESTAMP,
+                CURRENT_TIMESTAMP
+              )
+              ON CONFLICT (username) DO NOTHING;
+
+
+  # --------------------------------------------------
+  # ASSIGN ROLES TO USERS
+  # --------------------------------------------------
+
+  - changeSet:
+      id: 2026-05-02-006-assign-user-roles
+      author: custard
+      changes:
+        - sql:
+            splitStatements: false
+            sql: |
+
+              INSERT INTO user_roles (id, user_id, role_id, created_at, updated_at)
+              SELECT
+                gen_random_uuid(),
+                u.id,
+                r.id,
+                CURRENT_TIMESTAMP,
+                CURRENT_TIMESTAMP
+              FROM app_users u
+              JOIN app_roles r ON r.name = 'ADMIN'
+              WHERE u.username = 'admin'
+              ON CONFLICT DO NOTHING;
+
+              INSERT INTO user_roles (id, user_id, role_id, created_at, updated_at)
+              SELECT gen_random_uuid(), u.id, r.id, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+              FROM app_users u JOIN app_roles r ON r.name = 'RECEPTIONIST'
+              WHERE u.username = 'receptionist'
+              ON CONFLICT DO NOTHING;
+
+              INSERT INTO user_roles (id, user_id, role_id, created_at, updated_at)
+              SELECT gen_random_uuid(), u.id, r.id, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+              FROM app_users u JOIN app_roles r ON r.name = 'NURSE'
+              WHERE u.username = 'nurse'
+              ON CONFLICT DO NOTHING;
+
+              INSERT INTO user_roles (id, user_id, role_id, created_at, updated_at)
+              SELECT gen_random_uuid(), u.id, r.id, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+              FROM app_users u JOIN app_roles r ON r.name = 'DOCTOR'
+              WHERE u.username = 'doctor'
+              ON CONFLICT DO NOTHING;
+
+              INSERT INTO user_roles (id, user_id, role_id, created_at, updated_at)
+              SELECT gen_random_uuid(), u.id, r.id, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+              FROM app_users u JOIN app_roles r ON r.name = 'LAB_TECHNICIAN'
+              WHERE u.username = 'labtech'
+              ON CONFLICT DO NOTHING;
+
+              INSERT INTO user_roles (id, user_id, role_id, created_at, updated_at)
+              SELECT gen_random_uuid(), u.id, r.id, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+              FROM app_users u JOIN app_roles r ON r.name = 'PHARMACIST'
+              WHERE u.username = 'pharmacist'
+              ON CONFLICT DO NOTHING;
+
+              INSERT INTO user_roles (id, user_id, role_id, created_at, updated_at)
+              SELECT gen_random_uuid(), u.id, r.id, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+              FROM app_users u JOIN app_roles r ON r.name = 'CASHIER'
+              WHERE u.username = 'cashier'
+              ON CONFLICT DO NOTHING;
