@@ -3,6 +3,7 @@ package com.custard.ehr.payment.presentation;
 import com.custard.ehr.payment.application.dto.CreateInvoiceRequest;
 import com.custard.ehr.payment.application.dto.InvoiceResponse;
 import com.custard.ehr.payment.application.service.InvoiceService;
+import com.custard.ehr.payment.domain.InvoiceStatus;
 import com.custard.ehr.shared.infrastruture.web.AppApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -121,7 +122,7 @@ public class InvoiceController {
         return AppApiResponse.success(invoiceService.getByPatient(patientId));
     }
 
-    @GetMapping("/unpaid")
+    @GetMapping("/filter/{status}")
     @Operation(
             summary = "Get unpaid invoices",
             description = "Fetch all invoices that are not yet paid"
@@ -134,7 +135,8 @@ public class InvoiceController {
             ),
             @ApiResponse(responseCode = "403", description = "Forbidden")
     })
-    public AppApiResponse<List<InvoiceResponse>> getUnpaidInvoices() {
-        return AppApiResponse.success(invoiceService.getUnpaidInvoices());
+    public AppApiResponse<List<InvoiceResponse>> getUnpaidInvoices(@PathVariable("status") String status) {
+        var invoiceStatus = InvoiceStatus.valueOf(status);
+        return AppApiResponse.success(invoiceService.getUnpaidInvoices(invoiceStatus));
     }
 }

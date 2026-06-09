@@ -11,6 +11,7 @@ import java.util.UUID;
 public record InvoiceResponse(
         UUID id,
         UUID encounterId,
+        String patientName,
         UUID patientId,
         UUID createdBy,
         Instant createdAt,
@@ -23,6 +24,25 @@ public record InvoiceResponse(
         return new InvoiceResponse(
                 invoice.getId(),
                 invoice.getEncounterId(),
+                "",
+                invoice.getPatientId(),
+                invoice.getCreatedBy(),
+                invoice.getCreatedAt(),
+                invoice.getTotalAmount(),
+                invoice.getAmountPaid(),
+                invoice.getStatus(),
+                invoice.getItems()
+                        .stream()
+                        .map(InvoiceItemResponse::from)
+                        .toList()
+        );
+    }
+
+    public static InvoiceResponse from(Invoice invoice, String patientName) {
+        return new InvoiceResponse(
+                invoice.getId(),
+                invoice.getEncounterId(),
+                patientName,
                 invoice.getPatientId(),
                 invoice.getCreatedBy(),
                 invoice.getCreatedAt(),

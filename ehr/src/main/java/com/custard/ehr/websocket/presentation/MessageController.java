@@ -21,6 +21,7 @@ public class MessageController {
         ChatMessage chatMessage = new ChatMessage();
         chatMessage.setFrom(from);
         chatMessage.setText(text);
+
         return chatMessage;
     }
 

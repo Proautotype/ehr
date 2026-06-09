@@ -2,13 +2,16 @@ package com.custard.ehr.vitals.application.service;
 
 import com.custard.ehr.encounter.EncounterIdentifierVerifier;
 import com.custard.ehr.encounter.EncounterLookupView;
+import com.custard.ehr.encounter.domain.EncounterStatus;
 import com.custard.ehr.patient.PatientIdentifierVerifier;
 import com.custard.ehr.shared.events.VitalsRecordedEvent;
 import com.custard.ehr.shared.exception.BusinessException;
 import com.custard.ehr.shared.exception.NotFoundException;
 import com.custard.ehr.shared.security.SecurityUtils;
 import com.custard.ehr.vitals.application.dto.RecordVitalsRequest;
+import com.custard.ehr.vitals.application.dto.UpdateVitalsRequest;
 import com.custard.ehr.vitals.application.dto.VitalsResponse;
+import com.custard.ehr.vitals.application.mapper.VitalsMapper;
 import com.custard.ehr.vitals.application.ports.VitalsRepository;
 import com.custard.ehr.vitals.domain.Vitals;
 import org.slf4j.Logger;
@@ -163,5 +166,23 @@ public class VitalsService {
             log.warn("Vitals recording blocked. Encounter {} is not active or does not exist", encounterId);
             throw new BusinessException("Encounter is not active or does not exist");
         }
+    }
+
+    @Transactional
+    public boolean updateRecord(UUID encounterId, UpdateVitalsRequest request) {
+
+        // lookup encounter
+        EncounterStatus status = encounterIdentifierVerifier
+                .getStatus(encounterId);
+
+        if(status != EncounterStatus.ACTIVE){
+            throw new BusinessException("You cannot edit an inactive process");
+        }
+
+        vitalsRepository.findByEncounterId(encounterId).ifPresent(vitals -> {
+            VitalsMapper.toUpdate(vitals, request);
+            vitalsRepository.save(vitals);
+        });
+        return true;
     }
 }

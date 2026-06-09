@@ -5,6 +5,7 @@ import com.custard.ehr.encounter.EncounterLabStatusUpdater;
 import com.custard.ehr.encounter.EncounterLookupView;
 import com.custard.ehr.laboratory.application.dto.CreateLabOrderRequest;
 import com.custard.ehr.laboratory.application.dto.LabOrderResponse;
+import com.custard.ehr.laboratory.application.dto.external.LabOrderPatientProjectionResponse;
 import com.custard.ehr.laboratory.application.ports.LabOrderRepository;
 import com.custard.ehr.laboratory.application.ports.LabTestRepository;
 import com.custard.ehr.laboratory.domain.LabOrder;
@@ -36,19 +37,22 @@ public class LabOrderService {
     private final EncounterIdentifierVerifier encounterIdentifierVerifier;
     private final EncounterLabStatusUpdater encounterLabStatusUpdater;
     private final ApplicationEventPublisher eventPublisher;
+    private final LabPatientService  labPatientService;
 
     public LabOrderService(
             LabOrderRepository labOrderRepository,
             LabTestRepository labTestRepository,
             EncounterIdentifierVerifier encounterIdentifierVerifier,
             EncounterLabStatusUpdater encounterLabStatusUpdater,
-            ApplicationEventPublisher eventPublisher
+            ApplicationEventPublisher eventPublisher,
+            LabPatientService  labPatientService
     ) {
         this.labOrderRepository = labOrderRepository;
         this.labTestRepository = labTestRepository;
         this.encounterIdentifierVerifier = encounterIdentifierVerifier;
         this.encounterLabStatusUpdater = encounterLabStatusUpdater;
         this.eventPublisher = eventPublisher;
+        this.labPatientService = labPatientService;
     }
 
     @Transactional
@@ -129,6 +133,13 @@ public class LabOrderService {
                 .stream()
                 .map(LabOrderResponse::from)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<LabOrderPatientProjectionResponse> findLabOrdersByStatus(String status) {
+        List<LabOrderPatientProjectionResponse> byStatus = labPatientService.findByStatus(status);
+        log.info("Get lab orders by status {}", byStatus);
+        return byStatus;
     }
 
     private void validateDuplicateTests(List<UUID> labTestIds) {

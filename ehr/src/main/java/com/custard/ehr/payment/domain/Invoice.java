@@ -1,5 +1,6 @@
 package com.custard.ehr.payment.domain;
 
+import com.custard.ehr.payment.application.dto.InvoiceItemType;
 import com.custard.ehr.shared.domain.AuditableEntity;
 import com.custard.ehr.shared.exception.BusinessException;
 import jakarta.persistence.*;
@@ -22,11 +23,13 @@ public class Invoice extends AuditableEntity {
     @Id
     private UUID id = UUID.randomUUID();
 
-    @Column(nullable = false)
     private UUID encounterId;
 
     @Column(nullable = false)
     private UUID patientId;
+
+    @Column(nullable = false)
+    private String patientNumber;
 
     @Column(nullable = false)
     private UUID createdBy;
@@ -60,13 +63,24 @@ public class Invoice extends AuditableEntity {
         this.createdAt = Instant.now();
     }
 
-    public void addItem(String description, BigDecimal amount) {
+    public void addItem(InvoiceItemType description, BigDecimal amount) {
         if (status != InvoiceStatus.UNPAID) {
             throw new BusinessException("Cannot add item to invoice after payment has started");
         }
 
         InvoiceItem item = new InvoiceItem(this, description, amount);
         items.add(item);
+        recalculateTotal();
+    }
+
+    public void addItem(InvoiceItem invoiceItem) {
+        if (status != InvoiceStatus.UNPAID) {
+            throw new BusinessException("Cannot add item to invoice after payment has started");
+        }
+
+        invoiceItem.setInvoice(this);
+
+        items.add(invoiceItem);
         recalculateTotal();
     }
 
@@ -117,4 +131,44 @@ public class Invoice extends AuditableEntity {
     public BigDecimal getAmountPaid() { return amountPaid; }
     public InvoiceStatus getStatus() { return status; }
     public List<InvoiceItem> getItems() { return Collections.unmodifiableList(items); }
+
+    public void setEncounterId(UUID encounterId) {
+        this.encounterId = encounterId;
+    }
+
+    public void setPatientId(UUID patientId) {
+        this.patientId = patientId;
+    }
+
+    public String getPatientNumber() {
+        return patientNumber;
+    }
+
+    public void setPatientNumber(String patientNumber) {
+        this.patientNumber = patientNumber;
+    }
+
+    public void setCreatedBy(UUID createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public void setTotalAmount(BigDecimal totalAmount) {
+        this.totalAmount = totalAmount;
+    }
+
+    public void setAmountPaid(BigDecimal amountPaid) {
+        this.amountPaid = amountPaid;
+    }
+
+    public void setStatus(InvoiceStatus status) {
+        this.status = status;
+    }
+
+    public void setItems(List<InvoiceItem> items) {
+        this.items = items;
+    }
 }

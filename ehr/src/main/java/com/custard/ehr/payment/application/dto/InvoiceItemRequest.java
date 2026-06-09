@@ -7,7 +7,7 @@ import jakarta.validation.constraints.Positive;
 import java.math.BigDecimal;
 
 public record InvoiceItemRequest(
-        @NotBlank String description,
+        @NotBlank InvoiceItemType invoiceItemType,
         @NotNull @Positive BigDecimal amount
 ) {
 }

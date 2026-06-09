@@ -1,4 +1,4 @@
-package com.custard.ehr.payment.infrastructure;
+package com.custard.ehr.payment.infrastructure.jpaRepository;
 
 import com.custard.ehr.payment.application.ports.PaymentRepository;
 import com.custard.ehr.payment.domain.Payment;

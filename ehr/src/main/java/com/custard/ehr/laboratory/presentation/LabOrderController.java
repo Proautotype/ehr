@@ -2,17 +2,18 @@ package com.custard.ehr.laboratory.presentation;
 
 import com.custard.ehr.laboratory.application.dto.CreateLabOrderRequest;
 import com.custard.ehr.laboratory.application.dto.LabOrderResponse;
+import com.custard.ehr.laboratory.application.dto.RecordLabResultRequest;
+import com.custard.ehr.laboratory.application.dto.external.LabOrderPatientProjectionResponse;
 import com.custard.ehr.laboratory.application.service.LabOrderService;
 import com.custard.ehr.laboratory.application.service.LabResultService;
-import com.custard.ehr.laboratory.application.dto.RecordLabResultRequest;
 import com.custard.ehr.shared.infrastruture.web.AppApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -133,7 +134,7 @@ public class LabOrderController {
     )
     @ApiResponses({
             @ApiResponse(
-                    responseCode = "200",
+                    responseCode = "201",
                     description = "Lab result recorded successfully",
                     content = @Content(schema = @Schema(implementation = LabOrderResponse.class))
             ),
@@ -156,4 +157,22 @@ public class LabOrderController {
                 labResultService.recordResult(labOrderId, request)
         );
     }
+
+    @GetMapping("/status/{status}")
+    @Operation(
+            summary = "Get Laboratory orders by status",
+            description = "Use this handler to get all lab orders with requested status"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Return a list of Lab Orders"
+
+            ),
+            @ApiResponse(responseCode = "403", description = "Forbidden")
+    })
+    public AppApiResponse<List<LabOrderPatientProjectionResponse>> getByLabStatus(@PathVariable("status") String status) {
+        return AppApiResponse.success(labOrderService.findLabOrdersByStatus(status.toUpperCase()));
+    }
+
 }

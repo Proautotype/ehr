@@ -67,7 +67,7 @@ public class InvoiceService {
         );
 
         request.items().forEach(item ->
-                invoice.addItem(item.description(), item.amount())
+                invoice.addItem(item.invoiceItemType(), item.amount())
         );
 
         Invoice saved = invoiceRepository.save(invoice);
@@ -122,10 +122,10 @@ public class InvoiceService {
     }
 
     @Transactional(readOnly = true)
-    public List<InvoiceResponse> getUnpaidInvoices() {
+    public List<InvoiceResponse> getUnpaidInvoices(InvoiceStatus status) {
         log.debug("Fetching unpaid invoices");
 
-        return invoiceRepository.findByStatusOrderByCreatedAtAsc(InvoiceStatus.UNPAID)
+        return invoiceRepository.findByStatusOrderByCreatedAtAsc(status)
                 .stream()
                 .map(InvoiceResponse::from)
                 .toList();

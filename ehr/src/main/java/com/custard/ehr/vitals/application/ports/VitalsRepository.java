@@ -12,6 +12,7 @@ public interface VitalsRepository {
     Vitals save(Vitals vitals);
 
     Optional<Vitals> findById(UUID id);
+    Optional<Vitals> findByEncounterId(UUID id);
 
     Optional<Vitals> findTopByEncounterIdOrderByRecordedAtDesc(UUID encounterId);
 

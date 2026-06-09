@@ -69,6 +69,7 @@ public class Patient extends AuditableEntity {
         this.phoneNumber = phoneNumber;
         this.email = email;
         this.address = address;
+        this.active = true;
     }
 
     public void addAllergy(String name, String severity, String reaction) {

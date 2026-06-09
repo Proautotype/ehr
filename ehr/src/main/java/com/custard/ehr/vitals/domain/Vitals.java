@@ -97,6 +97,39 @@ public class Vitals extends AuditableEntity {
         this.recordedAt = Instant.now();
     }
 
+    public Vitals(
+            UUID encounterId,
+            Integer systolic,
+            Integer diastolic,
+            BigDecimal weightKg,
+            BigDecimal heightCm,
+            BigDecimal temperatureCelsius,
+            Integer pulseRate,
+            Integer respiratoryRate,
+            Integer oxygenSaturation,
+            String notes
+    ) {
+        validateBloodPressure(systolic, diastolic);
+        validateWeightAndHeight(weightKg, heightCm);
+        validateOptionalRange("Temperature", temperatureCelsius, BigDecimal.valueOf(30), BigDecimal.valueOf(45));
+        validateOptionalRange("Pulse rate", pulseRate, 20, 250);
+        validateOptionalRange("Respiratory rate", respiratoryRate, 5, 80);
+        validateOptionalRange("Oxygen saturation", oxygenSaturation, 50, 100);
+
+        this.encounterId = encounterId;
+        this.systolic = systolic;
+        this.diastolic = diastolic;
+        this.weightKg = weightKg;
+        this.heightCm = heightCm;
+        this.bmi = calculateBmi(weightKg, heightCm);
+        this.temperatureCelsius = temperatureCelsius;
+        this.pulseRate = pulseRate;
+        this.respiratoryRate = respiratoryRate;
+        this.oxygenSaturation = oxygenSaturation;
+        this.notes = notes;
+        this.recordedAt = Instant.now();
+    }
+
     private void validateBloodPressure(Integer systolic, Integer diastolic) {
         if (systolic == null && diastolic == null) {
             return;
@@ -208,5 +241,53 @@ public class Vitals extends AuditableEntity {
 
     public String getNotes() {
         return notes;
+    }
+
+    public void setRecordedBy(UUID recordedBy) {
+        this.recordedBy = recordedBy;
+    }
+
+    public void setRecordedAt(Instant recordedAt) {
+        this.recordedAt = recordedAt;
+    }
+
+    public void setSystolic(Integer systolic) {
+        this.systolic = systolic;
+    }
+
+    public void setDiastolic(Integer diastolic) {
+        this.diastolic = diastolic;
+    }
+
+    public void setWeightKg(BigDecimal weightKg) {
+        this.weightKg = weightKg;
+    }
+
+    public void setHeightCm(BigDecimal heightCm) {
+        this.heightCm = heightCm;
+    }
+
+    public void setBmi(BigDecimal bmi) {
+        this.bmi = bmi;
+    }
+
+    public void setTemperatureCelsius(BigDecimal temperatureCelsius) {
+        this.temperatureCelsius = temperatureCelsius;
+    }
+
+    public void setPulseRate(Integer pulseRate) {
+        this.pulseRate = pulseRate;
+    }
+
+    public void setRespiratoryRate(Integer respiratoryRate) {
+        this.respiratoryRate = respiratoryRate;
+    }
+
+    public void setOxygenSaturation(Integer oxygenSaturation) {
+        this.oxygenSaturation = oxygenSaturation;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
     }
 }

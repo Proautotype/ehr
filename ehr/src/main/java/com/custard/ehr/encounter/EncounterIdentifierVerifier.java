@@ -2,6 +2,7 @@ package com.custard.ehr.encounter;
 
 import com.custard.ehr.encounter.application.ports.EncounterRepository;
 import com.custard.ehr.encounter.domain.EncounterStatus;
+import lombok.val;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,7 @@ import java.util.UUID;
 public interface EncounterIdentifierVerifier {
     boolean isActive(UUID encounterId);
     Optional<EncounterLookupView> findActiveEncounter(UUID encounterId);
+    EncounterStatus getStatus(UUID encounterId);
 }
 
 
@@ -48,5 +50,10 @@ class EncounterLookupService implements EncounterIdentifierVerifier {
                         encounter.getId(),
                         encounter.getPatientId()
                 ));
+    }
+
+    @Override
+    public EncounterStatus getStatus(UUID encounterId) {
+        return encounterRepository.findById(encounterId).orElseThrow().getStatus();
     }
 }

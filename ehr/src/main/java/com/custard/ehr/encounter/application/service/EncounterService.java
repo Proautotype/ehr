@@ -10,6 +10,7 @@ import com.custard.ehr.patient.PatientIdentifierVerifier;
 import com.custard.ehr.shared.events.*;
 import com.custard.ehr.shared.exception.BusinessException;
 import com.custard.ehr.shared.exception.NotFoundException;
+import com.custard.ehr.shared.infrastruture.config.Utils;
 import com.custard.ehr.shared.security.SecurityUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;

@@ -10,6 +10,8 @@ import java.util.UUID;
 
 public interface JpaVitalsRepository extends JpaRepository<Vitals, UUID>, VitalsRepository {
 
+    Optional<Vitals> findByEncounterId(UUID encounter);
+
     Optional<Vitals> findTopByEncounterIdOrderByRecordedAtDesc(UUID encounterId);
 
     List<Vitals> findByEncounterIdOrderByRecordedAtDesc(UUID encounterId);

@@ -2,6 +2,7 @@ package com.custard.ehr.vitals.presentation;
 
 import com.custard.ehr.shared.infrastruture.web.AppApiResponse;
 import com.custard.ehr.vitals.application.dto.RecordVitalsRequest;
+import com.custard.ehr.vitals.application.dto.UpdateVitalsRequest;
 import com.custard.ehr.vitals.application.dto.VitalsResponse;
 import com.custard.ehr.vitals.application.service.VitalsService;
 import jakarta.validation.Valid;
@@ -18,7 +19,7 @@ import java.util.UUID;
 @Slf4j
 public class VitalsController {
 
-    private final Logger log  = LoggerFactory.getLogger(VitalsController.class);
+    private final Logger log = LoggerFactory.getLogger(VitalsController.class);
     private final VitalsService vitalsService;
 
     public VitalsController(VitalsService vitalsService) {
@@ -38,6 +39,18 @@ public class VitalsController {
                 "Vitals recorded successfully",
                 vitalsService.recordVitals(request)
         );
+    }
+
+    @PatchMapping("/{id}")
+    public AppApiResponse<Boolean> update(
+            @PathVariable("id") UUID encounterId,
+            @Valid @RequestBody UpdateVitalsRequest request
+    ) {
+        log.info("update vitals by id {}", encounterId);
+
+        var updateRecord = vitalsService.updateRecord(encounterId, request);
+
+        return AppApiResponse.success("Vitals recorded successfully", updateRecord);
     }
 
     @GetMapping("/{id}")

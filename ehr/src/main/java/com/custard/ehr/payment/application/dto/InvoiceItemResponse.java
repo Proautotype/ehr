@@ -7,14 +7,20 @@ import java.util.UUID;
 
 public record InvoiceItemResponse(
         UUID id,
-        String description,
-        BigDecimal amount
+        InvoiceItemType invoiceItemType,
+        BigDecimal amount,
+        int quantity,
+        BigDecimal unitPrice,
+        String itemReferenceId
 ) {
     public static InvoiceItemResponse from(InvoiceItem item) {
         return new InvoiceItemResponse(
                 item.getId(),
-                item.getDescription(),
-                item.getAmount()
+                item.getInvoiceItemType(),
+                item.getAmount(),
+                item.getQuantity(),
+                item.getUnitPrice(),
+                item.getItemReferenceId()
         );
     }
 }
