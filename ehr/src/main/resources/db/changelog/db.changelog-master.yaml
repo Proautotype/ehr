@@ -11,3 +11,5 @@ databaseChangeLog:
       file: db/changelog/changes/004-seed-stock-items.yaml
   - include:
       file: db/changelog/changes/005-seed-lab-tests.yaml
+  - include:
+      file: db/changelog/changes/lab_tests_reference_range_update.yaml

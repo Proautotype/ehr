@@ -8,8 +8,8 @@ import java.util.UUID;
 public record RecordLabResultRequest(
         @NotNull UUID labOrderItemId,
         @NotBlank String resultValue,
-        String unit,
         String referenceRange,
-        String interpretation
+        String interpretation,
+        String clinicalNotes
 ) {
 }

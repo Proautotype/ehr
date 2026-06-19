@@ -1,7 +1,10 @@
 package com.custard.ehr.audit.infrastructure;
 
 import com.custard.ehr.audit.application.AuditService;
+import com.custard.ehr.audit.domain.AuditLog;
 import com.custard.ehr.shared.events.*;
+import com.custard.ehr.shared.infrastruture.config.Utils;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.modulith.events.ApplicationModuleListener;
 import org.springframework.stereotype.Component;
 
@@ -9,9 +12,13 @@ import org.springframework.stereotype.Component;
 public class AuditEventListener {
 
     private final AuditService auditService;
+    private final SimpMessagingTemplate messaging;
+    private final String BROKER_PREFIX = "/topic/%s";
 
-    public AuditEventListener(AuditService auditService) {
+
+    public AuditEventListener(AuditService auditService, SimpMessagingTemplate messaging) {
         this.auditService = auditService;
+        this.messaging = messaging;
     }
 
     @ApplicationModuleListener
@@ -72,17 +79,26 @@ public class AuditEventListener {
 
     @ApplicationModuleListener
     public void onVitalsRecorded(VitalsRecordedEvent event) {
-        auditService.record(
-                "VITALS_RECORDED",
-                "vitals",
-                "Vitals",
-                event.vitalsId(),
-                event.recordedBy(),
-                null,
-                event.recordedAt(),
-                "Vitals recorded for patient: " + event.patientId() +
-                        " under encounter: " + event.encounterId()
-        );
+        
+        try{
+            AuditLog record = auditService.record(
+                    "VITALS_RECORDED",
+                    "vitals",
+                    "Vitals",
+                    event.vitalsId(),
+                    event.recordedBy(),
+                    null,
+                    event.recordedAt(),
+                    "Vitals recorded for patient: " + event.patientId() +
+                            " under encounter: " + event.encounterId()
+            );
+            messaging.convertAndSend(
+                    String.format(BROKER_PREFIX, "VITALS_RECORDED"),
+                    Utils.mapper().writeValueAsString(record)
+            );
+        }catch (Exception e){
+            throw new RuntimeException(e);
+        }
     }
 
     @ApplicationModuleListener
@@ -192,17 +208,26 @@ public class AuditEventListener {
 
     @ApplicationModuleListener
     public void onLabOrderCreated(LabOrderCreatedEvent event) {
-        auditService.record(
-                "LAB_ORDER_CREATED",
-                "laboratory",
-                "LabOrder",
-                event.labOrderId(),
-                event.orderedBy(),
-                null,
-                event.orderedAt(),
-                "Lab order created for patient: " + event.patientId() +
-                        " under encounter: " + event.encounterId()
-        );
+        try {
+            AuditLog record = auditService.record(
+                    "LAB_ORDER_CREATED",
+                    "laboratory",
+                    "LabOrder",
+                    event.labOrderId(),
+                    event.orderedBy(),
+                    null,
+                    event.orderedAt(),
+                    "Lab order created for patient: " + event.patientId() +
+                            " under encounter: " + event.encounterId()
+            );
+            messaging.convertAndSend(
+                    String.format(BROKER_PREFIX, "LAB_ORDER_CREATED"),
+                    Utils.mapper().writeValueAsString(record)
+            );
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     @ApplicationModuleListener

@@ -8,7 +8,6 @@ import java.util.UUID;
 public record LabResultResponse(
         UUID id,
         String resultValue,
-        String unit,
         String referenceRange,
         String interpretation,
         UUID recordedBy,
@@ -22,7 +21,6 @@ public record LabResultResponse(
         return new LabResultResponse(
                 result.getId(),
                 result.getResultValue(),
-                result.getUnit(),
                 result.getReferenceRange(),
                 result.getInterpretation(),
                 result.getRecordedBy(),

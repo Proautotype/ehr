@@ -1,6 +1,8 @@
 package com.custard.ehr.laboratory.application.service;
 
 import com.custard.ehr.encounter.EncounterLabStatusUpdater;
+import com.custard.ehr.identity.IdentityLookupService;
+import com.custard.ehr.identity.domain.AppUser;
 import com.custard.ehr.laboratory.application.dto.LabOrderResponse;
 import com.custard.ehr.laboratory.application.dto.RecordLabResultRequest;
 import com.custard.ehr.laboratory.application.ports.LabOrderRepository;
@@ -15,6 +17,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,15 +35,18 @@ public class LabResultService {
     private final LabOrderRepository labOrderRepository;
     private final EncounterLabStatusUpdater encounterLabStatusUpdater;
     private final ApplicationEventPublisher eventPublisher;
+    private final IdentityLookupService identityLookupService;
 
     public LabResultService(
             LabOrderRepository labOrderRepository,
             EncounterLabStatusUpdater encounterLabStatusUpdater,
-            ApplicationEventPublisher eventPublisher
+            ApplicationEventPublisher eventPublisher,
+            IdentityLookupService identityLookupService
     ) {
         this.labOrderRepository = labOrderRepository;
         this.encounterLabStatusUpdater = encounterLabStatusUpdater;
         this.eventPublisher = eventPublisher;
+        this.identityLookupService = identityLookupService;
     }
 
     @Transactional
@@ -66,14 +74,15 @@ public class LabResultService {
             throw new BusinessException("Result already recorded for this lab order item");
         }
 
-        UUID recordedBy = SecurityUtils.requireCurrentUserId();
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        AppUser userNotFound = identityLookupService.getByUsername(user.getUsername())
+                .orElseThrow(() -> new NotFoundException("User not found"));
 
         item.recordResult(
                 request.resultValue(),
-                request.unit(),
                 request.referenceRange(),
                 request.interpretation(),
-                recordedBy
+                userNotFound.getId()
         );
 
         order.markResulted();
@@ -92,7 +101,7 @@ public class LabResultService {
                         item.getId(),
                         saved.getEncounterId(),
                         saved.getPatientId(),
-                        recordedBy,
+                        userNotFound.getId(),
                         completed,
                         Instant.now()
                 )

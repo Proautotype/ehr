@@ -3,6 +3,8 @@ package com.custard.ehr.laboratory.application.service;
 import com.custard.ehr.encounter.EncounterIdentifierVerifier;
 import com.custard.ehr.encounter.EncounterLabStatusUpdater;
 import com.custard.ehr.encounter.EncounterLookupView;
+import com.custard.ehr.identity.IdentityLookupService;
+import com.custard.ehr.identity.domain.AppUser;
 import com.custard.ehr.laboratory.application.dto.CreateLabOrderRequest;
 import com.custard.ehr.laboratory.application.dto.LabOrderResponse;
 import com.custard.ehr.laboratory.application.dto.external.LabOrderPatientProjectionResponse;
@@ -13,17 +15,19 @@ import com.custard.ehr.laboratory.domain.LabTest;
 import com.custard.ehr.shared.events.LabOrderCreatedEvent;
 import com.custard.ehr.shared.exception.BusinessException;
 import com.custard.ehr.shared.exception.NotFoundException;
-import com.custard.ehr.shared.security.SecurityUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -37,7 +41,8 @@ public class LabOrderService {
     private final EncounterIdentifierVerifier encounterIdentifierVerifier;
     private final EncounterLabStatusUpdater encounterLabStatusUpdater;
     private final ApplicationEventPublisher eventPublisher;
-    private final LabPatientService  labPatientService;
+    private final LabPatientService labPatientService;
+    private final IdentityLookupService identityLookupService;
 
     public LabOrderService(
             LabOrderRepository labOrderRepository,
@@ -45,7 +50,7 @@ public class LabOrderService {
             EncounterIdentifierVerifier encounterIdentifierVerifier,
             EncounterLabStatusUpdater encounterLabStatusUpdater,
             ApplicationEventPublisher eventPublisher,
-            LabPatientService  labPatientService
+            LabPatientService labPatientService, IdentityLookupService identityLookupService
     ) {
         this.labOrderRepository = labOrderRepository;
         this.labTestRepository = labTestRepository;
@@ -53,6 +58,7 @@ public class LabOrderService {
         this.encounterLabStatusUpdater = encounterLabStatusUpdater;
         this.eventPublisher = eventPublisher;
         this.labPatientService = labPatientService;
+        this.identityLookupService = identityLookupService;
     }
 
     @Transactional
@@ -68,12 +74,17 @@ public class LabOrderService {
                     return new BusinessException("Encounter is not active or does not exist");
                 });
 
-        UUID orderedBy = SecurityUtils.requireCurrentUserId();
+        User user = (User) Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getPrincipal();
+        if (user == null) {
+            throw new BusinessException("User is not logged in");
+        }
+
+        AppUser userIsNotLoggedIn = identityLookupService.getByUsername(user.getUsername()).orElseThrow(() -> new BusinessException("User is not logged in"));
 
         LabOrder order = new LabOrder(
                 encounter.encounterId(),
                 encounter.patientId(),
-                orderedBy,
+                userIsNotLoggedIn.getId(),
                 request.clinicalNote()
         );
 

@@ -28,12 +28,13 @@ public class LabResult extends AuditableEntity {
     @Column(nullable = false, length = 2000)
     private String resultValue;
 
-    private String unit;
-
     private String referenceRange;
 
     @Column(length = 2000)
     private String interpretation;
+
+    @Column(length = 2000)
+    private String clinicalNotes;
 
     @Column(nullable = false)
     private UUID recordedBy;
@@ -47,7 +48,6 @@ public class LabResult extends AuditableEntity {
     public LabResult(
             LabOrderItem labOrderItem,
             String resultValue,
-            String unit,
             String referenceRange,
             String interpretation,
             UUID recordedBy
@@ -58,7 +58,6 @@ public class LabResult extends AuditableEntity {
 
         this.labOrderItem = labOrderItem;
         this.resultValue = resultValue;
-        this.unit = unit;
         this.referenceRange = referenceRange;
         this.interpretation = interpretation;
         this.recordedBy = recordedBy;
@@ -71,10 +70,6 @@ public class LabResult extends AuditableEntity {
 
     public String getResultValue() {
         return resultValue;
-    }
-
-    public String getUnit() {
-        return unit;
     }
 
     public String getReferenceRange() {

@@ -1,0 +1,77 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-add-reference-range-to-lab-tests
+      author: chatgpt
+      changes:
+        - addColumn:
+            tableName: lab_tests
+            columns:
+              - column:
+                  name: reference_range
+                  type: varchar(1000)
+
+  - changeSet:
+      id: 002-populate-reference-ranges
+      author: chatgpt
+      changes:
+        - sql:
+            sql: |
+              UPDATE lab_tests SET reference_range = 'See component tests' WHERE name = 'Full Blood Count';
+              UPDATE lab_tests SET reference_range = '12.0 - 17.5 g/dL (adult)' WHERE name = 'Hemoglobin';
+              UPDATE lab_tests SET reference_range = '36 - 53 % (adult)' WHERE name = 'Packed Cell Volume';
+              UPDATE lab_tests SET reference_range = '0 - 20 mm/hr (adult)' WHERE name = 'Erythrocyte Sedimentation Rate';
+              UPDATE lab_tests SET reference_range = 'A, B, AB, O; Rh Positive/Negative' WHERE name = 'Blood Grouping and Rh Factor';
+              UPDATE lab_tests SET reference_range = 'Negative' WHERE name = 'Sickling Test';
+              UPDATE lab_tests SET reference_range = 'Normal enzyme activity present' WHERE name = 'G6PD Test';
+              UPDATE lab_tests SET reference_range = 'No malaria parasites seen' WHERE name = 'Malaria Parasite Test';
+              UPDATE lab_tests SET reference_range = 'Negative' WHERE name = 'Malaria Rapid Diagnostic Test';
+
+              UPDATE lab_tests SET reference_range = 'No ova, cysts, parasites or pathogens detected' WHERE name = 'Stool Routine Examination';
+              UPDATE lab_tests SET reference_range = 'Negative' WHERE name = 'Stool Occult Blood Test';
+
+              UPDATE lab_tests SET reference_range = 'Normal urinalysis findings' WHERE name = 'Urine Routine Examination';
+              UPDATE lab_tests SET reference_range = 'Negative' WHERE name = 'Urine Pregnancy Test';
+              UPDATE lab_tests SET reference_range = 'No growth' WHERE name = 'Urine Culture and Sensitivity';
+
+              UPDATE lab_tests SET reference_range = '70 - 99 mg/dL' WHERE name = 'Blood Glucose Fasting';
+              UPDATE lab_tests SET reference_range = '70 - 140 mg/dL' WHERE name = 'Blood Glucose Random';
+              UPDATE lab_tests SET reference_range = '4.0 - 5.6 %' WHERE name = 'HbA1c';
+
+              UPDATE lab_tests SET reference_range = 'See component tests' WHERE name = 'Lipid Profile';
+
+              UPDATE lab_tests SET reference_range = '7 - 20 mg/dL' WHERE name = 'Urea';
+              UPDATE lab_tests SET reference_range = '0.6 - 1.3 mg/dL' WHERE name = 'Creatinine';
+              UPDATE lab_tests SET reference_range = 'See component tests' WHERE name = 'Urea Electrolytes and Creatinine';
+
+              UPDATE lab_tests SET reference_range = '135 - 145 mmol/L' WHERE name = 'Sodium';
+              UPDATE lab_tests SET reference_range = '3.5 - 5.0 mmol/L' WHERE name = 'Potassium';
+              UPDATE lab_tests SET reference_range = '98 - 107 mmol/L' WHERE name = 'Chloride';
+              UPDATE lab_tests SET reference_range = '8.5 - 10.5 mg/dL' WHERE name = 'Calcium';
+
+              UPDATE lab_tests SET reference_range = 'See component tests' WHERE name = 'Liver Function Test';
+              UPDATE lab_tests SET reference_range = '7 - 56 U/L' WHERE name = 'ALT';
+              UPDATE lab_tests SET reference_range = '10 - 40 U/L' WHERE name = 'AST';
+              UPDATE lab_tests SET reference_range = 'Total: 0.2 - 1.2 mg/dL; Direct: 0.0 - 0.3 mg/dL' WHERE name = 'Bilirubin Total and Direct';
+
+              UPDATE lab_tests SET reference_range = '< 0.04 ng/mL' WHERE name = 'Troponin I';
+              UPDATE lab_tests SET reference_range = '< 10 mg/L' WHERE name = 'C-Reactive Protein';
+
+              UPDATE lab_tests SET reference_range = 'No growth' WHERE name = 'Blood Culture and Sensitivity';
+              UPDATE lab_tests SET reference_range = 'No pathogenic growth' WHERE name = 'Wound Swab Culture and Sensitivity';
+              UPDATE lab_tests SET reference_range = 'No pathogenic growth' WHERE name = 'High Vaginal Swab Culture';
+              UPDATE lab_tests SET reference_range = 'No pathogenic growth' WHERE name = 'Throat Swab Culture';
+
+              UPDATE lab_tests SET reference_range = 'Non-reactive' WHERE name = 'HIV 1 and 2 Screening';
+              UPDATE lab_tests SET reference_range = 'Non-reactive' WHERE name = 'Hepatitis B Surface Antigen';
+              UPDATE lab_tests SET reference_range = 'Non-reactive' WHERE name = 'Hepatitis C Antibody';
+              UPDATE lab_tests SET reference_range = 'Non-reactive' WHERE name = 'Syphilis VDRL';
+              UPDATE lab_tests SET reference_range = 'Negative' WHERE name = 'Typhoid Widal Test';
+
+              UPDATE lab_tests SET reference_range = 'See component tests' WHERE name = 'Thyroid Function Test';
+              UPDATE lab_tests SET reference_range = '0.4 - 4.0 mIU/L' WHERE name = 'TSH';
+              UPDATE lab_tests SET reference_range = '2.3 - 4.2 pg/mL' WHERE name = 'Free T3';
+              UPDATE lab_tests SET reference_range = '0.8 - 1.8 ng/dL' WHERE name = 'Free T4';
+
+              UPDATE lab_tests SET reference_range = '11 - 13.5 seconds' WHERE name = 'Prothrombin Time';
+              UPDATE lab_tests SET reference_range = '25 - 35 seconds' WHERE name = 'Activated Partial Thromboplastin Time';
+              UPDATE lab_tests SET reference_range = '0.8 - 1.2' WHERE name = 'International Normalized Ratio';

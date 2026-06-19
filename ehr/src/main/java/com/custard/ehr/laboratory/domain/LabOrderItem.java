@@ -46,7 +46,6 @@ public class LabOrderItem extends AuditableEntity {
 
     public void recordResult(
             String resultValue,
-            String unit,
             String referenceRange,
             String interpretation,
             UUID recordedBy
@@ -54,7 +53,6 @@ public class LabOrderItem extends AuditableEntity {
         this.result = new LabResult(
                 this,
                 resultValue,
-                unit,
                 referenceRange,
                 interpretation,
                 recordedBy

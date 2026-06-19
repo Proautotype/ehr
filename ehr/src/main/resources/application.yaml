@@ -1,3 +1,8 @@
+
+logging:
+  level:
+    org.springframework.messaging: TRACE
+
 spring:
   application:
     name: ehr
@@ -46,3 +51,9 @@ app:
     topics:
       payment-events: payment-events
 
+ws:
+  endpoint: "/websocket"
+  broker:
+    prefix: "/topic,/queue"
+  app:
+    prefix: "/app"

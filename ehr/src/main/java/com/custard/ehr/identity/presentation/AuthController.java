@@ -6,12 +6,15 @@ import com.custard.ehr.identity.application.dto.RefreshTokenRequest;
 import com.custard.ehr.identity.application.service.AuthService;
 import com.custard.ehr.shared.infrastruture.web.AppApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -75,5 +78,12 @@ public class AuthController {
             @RequestBody RefreshTokenRequest request
     ) {
         return AppApiResponse.success(authService.refreshToken(request));
+    }
+
+    @GetMapping("/current-oauth-user")
+    public Object getCurrentOAuthUser(Authentication authentication) {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        return user;
     }
 }
