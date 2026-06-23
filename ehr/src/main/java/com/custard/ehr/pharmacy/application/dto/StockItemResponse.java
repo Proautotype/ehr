@@ -15,10 +15,10 @@ public record StockItemResponse(
     public static StockItemResponse from(StockItem item) {
         return new StockItemResponse(
                 item.getId(),
-                item.getDrugId(),
-                item.getDrugName(),
-                item.getStrength(),
-                item.getForm(),
+                item.getProduct().getId(),
+                item.getProduct().getName(),
+                item.getProduct().getStrength(),
+                item.getProduct().getForm(),
                 item.getQuantityAvailable()
         );
     }

@@ -1,16 +1,16 @@
 package com.custard.ehr.pharmacy.application.services;
 
-import com.custard.ehr.drug.DrugIdentifierVerifier;
-import com.custard.ehr.drug.DrugLookupView;
+import com.custard.ehr.pharmacy.DrugIdentifierVerifier;
 import com.custard.ehr.pharmacy.application.dto.AddStockRequest;
 import com.custard.ehr.pharmacy.application.dto.CreateStockItemRequest;
 import com.custard.ehr.pharmacy.application.dto.StockItemResponse;
+import com.custard.ehr.pharmacy.application.ports.DrugRepository;
 import com.custard.ehr.pharmacy.application.ports.StockMovementRepository;
 import com.custard.ehr.pharmacy.application.ports.StockRepository;
+import com.custard.ehr.pharmacy.domain.Drug;
 import com.custard.ehr.pharmacy.domain.StockItem;
 import com.custard.ehr.pharmacy.domain.StockMovement;
 import com.custard.ehr.pharmacy.domain.StockMovementType;
-import com.custard.ehr.pharmacy.presentation.PharmacyController;
 import com.custard.ehr.shared.events.StockAddedEvent;
 import com.custard.ehr.shared.exception.BusinessException;
 import com.custard.ehr.shared.exception.NotFoundException;
@@ -34,44 +34,41 @@ public class StockService {
 
     private final StockRepository stockRepository;
     private final StockMovementRepository stockMovementRepository;
-    private final DrugIdentifierVerifier drugIdentifierVerifier;
     private final ApplicationEventPublisher eventPublisher;
+    private final DrugRepository drugRepository;
 
     public StockService(
             StockRepository stockRepository,
             StockMovementRepository stockMovementRepository,
             DrugIdentifierVerifier drugIdentifierVerifier,
-            ApplicationEventPublisher eventPublisher
+            ApplicationEventPublisher eventPublisher, DrugRepository drugRepository
     ) {
         this.stockRepository = stockRepository;
         this.stockMovementRepository = stockMovementRepository;
-        this.drugIdentifierVerifier = drugIdentifierVerifier;
         this.eventPublisher = eventPublisher;
+        this.drugRepository = drugRepository;
     }
 
     @Transactional
     public StockItemResponse create(CreateStockItemRequest request) {
         log.info("Creating stock item for drug {}", request.drugId());
 
-        if (stockRepository.findByDrugId(request.drugId()).isPresent()) {
+        if (stockRepository.findByProductId(request.drugId()).isPresent()) {
             log.warn("Stock item creation blocked. Drug {} already has stock record", request.drugId());
             throw new BusinessException("Stock item already exists for this drug");
         }
 
-        DrugLookupView drug = drugIdentifierVerifier.findActiveDrug(request.drugId())
-                .orElseThrow(() -> {
-                    log.warn("Stock item creation blocked. Drug {} not found or inactive", request.drugId());
-                    return new BusinessException("Drug does not exist or is inactive");
-                });
+        Drug drug = drugRepository.findById(request.drugId()).orElseThrow(() -> {
+            log.warn("Stock item creation blocked. Drug {} not found or inactive", request.drugId());
+            return new BusinessException("Drug does not exist or is inactive");
+        });
 
         UUID performedBy = SecurityUtils.requireCurrentUserId();
 
         StockItem stockItem = new StockItem(
-                drug.drugId(),
-                drug.name(),
-                drug.strength(),
-                drug.form(),
-                request.openingQuantity()
+                request.openingQuantity(),
+                "",
+                drug
         );
 
         StockItem saved = stockRepository.save(stockItem);
@@ -79,8 +76,8 @@ public class StockService {
         if (request.openingQuantity() > 0) {
             stockMovementRepository.save(
                     new StockMovement(
-                            saved.getDrugId(),
-                            saved.getDrugName(),
+                            drug.getId(),
+                            drug.getName(),
                             StockMovementType.STOCK_IN,
                             request.openingQuantity(),
                             saved.getId(),
@@ -95,7 +92,7 @@ public class StockService {
         log.info(
                 "Stock item {} created for drug {} with opening quantity {}",
                 saved.getId(),
-                saved.getDrugName(),
+                drug.getName(),
                 saved.getQuantityAvailable()
         );
 
@@ -106,7 +103,12 @@ public class StockService {
     public StockItemResponse addStock(UUID drugId, AddStockRequest request) {
         log.info("Adding {} units to stock for drug {}", request.quantity(), drugId);
 
-        StockItem stockItem = stockRepository.findByDrugId(drugId)
+        Drug drug = drugRepository.findById(drugId).orElseThrow(() -> {
+            log.warn("Stock item creation blocked. Drug {} not found or inactive", drugId);
+            return new BusinessException("Drug does not exist or is inactive");
+        });
+
+        StockItem stockItem = stockRepository.findByProductId(drugId)
                 .orElseThrow(() -> {
                     log.warn("Stock addition failed. Stock item for drug {} not found", drugId);
                     return new NotFoundException("Stock item not found");
@@ -119,8 +121,8 @@ public class StockService {
 
         stockMovementRepository.save(
                 new StockMovement(
-                        saved.getDrugId(),
-                        saved.getDrugName(),
+                        drug.getId(),
+                        drug.getName(),
                         StockMovementType.STOCK_IN,
                         request.quantity(),
                         saved.getId(),
@@ -133,7 +135,7 @@ public class StockService {
 
         log.info(
                 "Stock updated for drug {}. Added={}, Available={}",
-                saved.getDrugName(),
+                drug.getName(),
                 request.quantity(),
                 saved.getQuantityAvailable()
         );
@@ -145,7 +147,7 @@ public class StockService {
     public StockItemResponse getByDrugId(UUID drugId) {
         log.debug("Fetching stock item for drug {}", drugId);
 
-        return stockRepository.findByDrugId(drugId)
+        return stockRepository.findByProductId(drugId)
                 .map(StockItemResponse::from)
                 .orElseThrow(() -> {
                     log.warn("Stock lookup failed. Drug {} has no stock record", drugId);
@@ -157,7 +159,7 @@ public class StockService {
     public List<StockItemResponse> search(String query) {
         log.debug("Searching stock with query {}", query);
 
-        return stockRepository.findTop20ByDrugNameContainingIgnoreCase(query)
+        return stockRepository.findTop20ByProductNameContainingIgnoreCase(query)
                 .stream()
                 .map(StockItemResponse::from)
                 .toList();
@@ -171,8 +173,8 @@ public class StockService {
         eventPublisher.publishEvent(
                 new StockAddedEvent(
                         stockItem.getId(),
-                        stockItem.getDrugId(),
-                        stockItem.getDrugName(),
+                        stockItem.getProduct().getId(),
+                        stockItem.getProduct().getName(),
                         quantity,
                         performedBy,
                         Instant.now()
@@ -182,7 +184,7 @@ public class StockService {
         log.debug(
                 "StockAddedEvent published. StockItem={}, Drug={}, Quantity={}",
                 stockItem.getId(),
-                stockItem.getDrugId(),
+                stockItem.getProduct().getId(),
                 quantity
         );
     }

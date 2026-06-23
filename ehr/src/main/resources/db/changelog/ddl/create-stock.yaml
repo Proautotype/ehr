@@ -1,0 +1,105 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-stock-table
+      author: custard
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      preConditions:
+        - onFail: MARK_RAN
+          onError: CONTINUE
+          not:
+            - tableExists:
+                tableName: stock
+      changes:
+        - sql:
+            dbms: postgresql
+            endDelimiter: ;
+            sql: |
+              -- Stock table to track inventory
+              CREATE TABLE public.stock (
+                id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                drug_id UUID NOT NULL REFERENCES public.drugs(id),
+                batch_number VARCHAR(255),
+                quantity INTEGER NOT NULL DEFAULT 0,
+                unit VARCHAR(50), -- e.g., "tablets", "ml", "mg"
+                expiry_date DATE,
+                manufactured_date DATE,
+                supplier_id UUID REFERENCES public.suppliers(id),
+                purchase_price DECIMAL(10,2),
+                selling_price DECIMAL(10,2),
+                location VARCHAR(255), -- warehouse/shelf location
+                status VARCHAR(50) DEFAULT 'available', -- available, low, expired, recalled
+                created_at TIMESTAMP(6) WITH TIME ZONE NOT NULL,
+                created_by UUID,
+                updated_at TIMESTAMP(6) WITH TIME ZONE NOT NULL,
+                updated_by UUID,
+                active BOOLEAN DEFAULT true
+              );
+
+  - changeSet:
+      id: create-stock-indexes
+      author: custard
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      preConditions:
+        - onFail: MARK_RAN
+          onError: CONTINUE
+          tableExists:
+            tableName: stock
+      changes:
+        - sql:
+            dbms: postgresql
+            endDelimiter: ;
+            sql: |
+              -- Indexes for stock performance
+              CREATE INDEX idx_stock_drug_id ON public.stock(drug_id);
+              CREATE INDEX idx_stock_expiry_date ON public.stock(expiry_date);
+              CREATE INDEX idx_stock_status ON public.stock(status);
+
+  - changeSet:
+      id: create-stock-transactions-table
+      author: custard
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      preConditions:
+        - onFail: MARK_RAN
+          onError: CONTINUE
+          not:
+            - tableExists:
+                tableName: stock_transactions
+      changes:
+        - sql:
+            dbms: postgresql
+            endDelimiter: ;
+            sql: |
+              -- Stock transactions for audit trail
+              CREATE TABLE public.stock_transactions (
+                id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                stock_id UUID NOT NULL REFERENCES public.stock(id),
+                transaction_type VARCHAR(50) NOT NULL, -- 'IN', 'OUT', 'ADJUSTMENT', 'RETURN'
+                quantity_change INTEGER NOT NULL,
+                previous_quantity INTEGER NOT NULL,
+                new_quantity INTEGER NOT NULL,
+                reference_type VARCHAR(50), -- 'PURCHASE_ORDER', 'SALE', 'RETURN'
+                reference_id UUID,
+                notes TEXT,
+                created_at TIMESTAMP(6) WITH TIME ZONE NOT NULL,
+                created_by UUID,
+                updated_at TIMESTAMP(6) WITH TIME ZONE NOT NULL,
+                updated_by UUID
+              );
+
+  - changeSet:
+      id: create-stock-transactions-indexes
+      author: custard
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      preConditions:
+        - onFail: MARK_RAN
+          onError: CONTINUE
+          tableExists:
+            tableName: stock_transactions
+      changes:
+        - sql:
+            dbms: postgresql
+            endDelimiter: ;
+            sql: |
+              -- Indexes for stock transactions performance
+              CREATE INDEX idx_stock_transactions_stock_id ON public.stock_transactions(stock_id);
+              CREATE INDEX idx_stock_transactions_created_at ON public.stock_transactions(created_at);

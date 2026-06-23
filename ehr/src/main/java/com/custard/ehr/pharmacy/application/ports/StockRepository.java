@@ -10,7 +10,7 @@ public interface StockRepository {
 
     StockItem save(StockItem stockItem);
 
-    Optional<StockItem> findByDrugId(UUID drugId);
+    Optional<StockItem> findByProductId(UUID drugId);
 
-    List<StockItem> findTop20ByDrugNameContainingIgnoreCase(String drugName);
+    List<StockItem> findTop20ByProductNameContainingIgnoreCase(String drugName);
 }

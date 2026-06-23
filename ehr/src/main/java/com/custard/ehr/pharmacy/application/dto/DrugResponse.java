@@ -1,6 +1,6 @@
-package com.custard.ehr.drug.application.dto;
+package com.custard.ehr.pharmacy.application.dto;
 
-import com.custard.ehr.drug.domain.Drug;
+import com.custard.ehr.pharmacy.domain.Drug;
 
 import java.util.UUID;
 

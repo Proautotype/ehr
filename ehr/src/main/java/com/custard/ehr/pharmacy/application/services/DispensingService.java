@@ -216,7 +216,7 @@ public class DispensingService {
             UUID dispenseRecordId,
             UUID pharmacistId
     ) {
-        var stock = stockRepository.findByDrugId(prescribedItem.drugId())
+        var stock = stockRepository.findByProductId(prescribedItem.drugId())
                 .orElseThrow(() -> {
                     log.warn("Stock not found for drug {}", prescribedItem.drugId());
                     return new BusinessException("Stock not found for drug: " + prescribedItem.drugName());

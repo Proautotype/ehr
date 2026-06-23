@@ -1,6 +1,5 @@
 package com.custard.ehr.prescription;
 
-
 import com.custard.ehr.prescription.application.ports.PrescriptionRepository;
 import com.custard.ehr.prescription.domain.Prescription;
 import com.custard.ehr.prescription.domain.PrescriptionStatus;

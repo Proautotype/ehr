@@ -1,7 +1,7 @@
-package com.custard.ehr.drug.presentation;
+package com.custard.ehr.pharmacy.presentation;
 
-import com.custard.ehr.drug.application.dto.DrugResponse;
-import com.custard.ehr.drug.application.service.DrugService;
+import com.custard.ehr.pharmacy.application.dto.DrugResponse;
+import com.custard.ehr.pharmacy.application.services.DrugService;
 import com.custard.ehr.shared.domain.PageResultDto;
 import com.custard.ehr.shared.infrastruture.web.AppApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController

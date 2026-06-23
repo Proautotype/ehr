@@ -10,25 +10,33 @@ import java.util.UUID;
 @Table(
         name = "stock_items",
         indexes = {
-                @Index(name = "idx_stock_drug", columnList = "drugId"),
-                @Index(name = "idx_stock_drug_name", columnList = "drugName")
+                @Index(name = "idx_stock_drug", columnList = "product.id"),
+                @Index(name = "idx_stock_drug_name", columnList = "product.name")
         }
 )
 public class StockItem extends AuditableEntity {
 
     @Id
     @Column(nullable = false, updatable = false)
-    private UUID id = UUID.randomUUID();
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
-    @Column(nullable = false, unique = true)
-    private UUID drugId;
+    @Column(name = "quantity")
+    private Integer quantity;
 
-    @Column(nullable = false)
-    private String drugName;
+    @Column(name = "batch_number")
+    private String batchNumber;
 
-    private String strength;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Drug product;
 
-    private String form;
+    // ✅ COST PRICE - lives on StockItem
+    @Column(name = "unit_cost")
+    private Double unitCost;
+
+    // unitCost * quantity
+    @Column(name = "total_cost")
+    private Double totalCost;
 
     @Column(nullable = false)
     private Integer quantityAvailable;
@@ -36,25 +44,23 @@ public class StockItem extends AuditableEntity {
     @Version
     private Long version;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Stock stock;
+
     protected StockItem() {
     }
 
     public StockItem(
-            UUID drugId,
-            String drugName,
-            String strength,
-            String form,
-            Integer quantityAvailable
+            Integer quantityAvailable,
+            String batchNumber,
+            Drug product
     ) {
         if (quantityAvailable == null || quantityAvailable < 0) {
             throw new BusinessException("Stock quantity cannot be negative");
         }
 
-        this.drugId = drugId;
-        this.drugName = drugName;
-        this.strength = strength;
-        this.form = form;
         this.quantityAvailable = quantityAvailable;
+        this.batchNumber = batchNumber;
     }
 
     public void deduct(Integer quantity) {
@@ -63,7 +69,7 @@ public class StockItem extends AuditableEntity {
         }
 
         if (quantityAvailable < quantity) {
-            throw new BusinessException("Insufficient stock for " + drugName);
+            throw new BusinessException("Insufficient stock for " + product.getName());
         }
 
         this.quantityAvailable -= quantity;
@@ -81,23 +87,23 @@ public class StockItem extends AuditableEntity {
         return id;
     }
 
-    public UUID getDrugId() {
-        return drugId;
-    }
-
-    public String getDrugName() {
-        return drugName;
-    }
-
-    public String getStrength() {
-        return strength;
-    }
-
-    public String getForm() {
-        return form;
-    }
-
     public Integer getQuantityAvailable() {
         return quantityAvailable;
+    }
+
+    public Drug getProduct() {
+        return product;
+    }
+
+    @Override
+    public String toString() {
+        return "StockItem{" +
+                "id=" + id +
+                ", quantity=" + quantity +
+                ", batchNumber='" + batchNumber + '\'' +
+                ", product=" + product +
+                ", quantityAvailable=" + quantityAvailable +
+                ", version=" + version +
+                '}';
     }
 }
