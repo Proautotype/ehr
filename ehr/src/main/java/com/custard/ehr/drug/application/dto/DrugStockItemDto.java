@@ -1,5 +1,6 @@
-package com.custard.ehr.pharmacy.application.dto;
+package com.custard.ehr.drug.application.dto;
 
+import com.custard.ehr.shared.domain.DrugStockItemStatus;
 import lombok.*;
 
 import java.util.UUID;
@@ -11,9 +12,9 @@ public class DrugStockItemDto {
     private UUID id;
     private String name;
     private Long quantity;
-    private String status;
+    private DrugStockItemStatus status;
 
-    public DrugStockItemDto(UUID id, String name, Long quantity, String status) {
+    public DrugStockItemDto(UUID id, String name, Long quantity, DrugStockItemStatus status) {
         this.id = id;
         this.name = name;
         this.quantity = quantity;

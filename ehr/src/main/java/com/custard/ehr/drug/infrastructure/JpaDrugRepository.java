@@ -1,8 +1,7 @@
-package com.custard.ehr.pharmacy.infrastructure;
+package com.custard.ehr.drug.infrastructure;
 
-import com.custard.ehr.pharmacy.application.dto.DrugStockItemDto;
-import com.custard.ehr.pharmacy.application.ports.DrugRepository;
-import com.custard.ehr.pharmacy.domain.Drug;
+import com.custard.ehr.drug.application.ports.DrugRepository;
+import com.custard.ehr.drug.domain.Drug;
 import jakarta.persistence.Tuple;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;

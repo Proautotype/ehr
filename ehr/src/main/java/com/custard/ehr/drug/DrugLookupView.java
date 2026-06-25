@@ -1,4 +1,4 @@
-package com.custard.ehr.pharmacy;
+package com.custard.ehr.drug;
 
 import java.util.UUID;
 

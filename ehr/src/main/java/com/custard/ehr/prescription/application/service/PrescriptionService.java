@@ -1,7 +1,7 @@
 package com.custard.ehr.prescription.application.service;
 
-import com.custard.ehr.pharmacy.DrugIdentifierVerifier;
-import com.custard.ehr.pharmacy.DrugLookupView;
+import com.custard.ehr.drug.DrugIdentifierVerifier;
+import com.custard.ehr.drug.DrugLookupView;
 import com.custard.ehr.encounter.EncounterIdentifierVerifier;
 import com.custard.ehr.encounter.EncounterLookupView;
 import com.custard.ehr.prescription.application.dto.CreatePrescriptionRequest;

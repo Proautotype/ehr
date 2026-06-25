@@ -1,11 +1,14 @@
-package com.custard.ehr.pharmacy.application.services;
+package com.custard.ehr.drug.application.services;
 
-import com.custard.ehr.pharmacy.application.dto.DrugResponse;
-import com.custard.ehr.pharmacy.application.dto.DrugStockItemDto;
+import com.custard.ehr.drug.application.dto.CreateDrugDto;
+import com.custard.ehr.drug.application.dto.DrugResponse;
+import com.custard.ehr.drug.application.dto.DrugStockItemDto;
+import com.custard.ehr.drug.application.mapper.DrugMapper;
 import com.custard.ehr.pharmacy.application.dto.ProductFilterRequest;
-import com.custard.ehr.pharmacy.application.ports.DrugRepository;
-import com.custard.ehr.pharmacy.domain.Drug;
-import com.custard.ehr.pharmacy.infrastructure.DrugSpecification;
+import com.custard.ehr.drug.application.ports.DrugRepository;
+import com.custard.ehr.drug.domain.Drug;
+import com.custard.ehr.drug.infrastructure.DrugSpecification;
+import com.custard.ehr.shared.domain.DrugStockItemStatus;
 import com.custard.ehr.shared.domain.PageResultDto;
 import jakarta.persistence.Tuple;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +20,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -29,6 +31,13 @@ public class DrugService {
 
     public DrugService(DrugRepository drugRepository) {
         this.drugRepository = drugRepository;
+    }
+
+    public DrugResponse create(CreateDrugDto createDrugDto){
+        Drug entity = DrugMapper.toEntity(createDrugDto);
+        Drug save = drugRepository.save(entity);
+        log.info("Successfully create new drug {}", save.getId());
+        return DrugResponse.from(save);
     }
 
     public PageResultDto<DrugResponse> search(String query, int size, int page, String sortBy) {
@@ -72,7 +81,7 @@ public class DrugService {
             Long quantity = tuple.get("quantity", Long.class);
             String status = tuple.get("status", String.class);
 
-            return new DrugStockItemDto(id, name, quantity, status);
+            return new DrugStockItemDto(id, name, quantity, DrugStockItemStatus.valueOf(status));
         }).toList();
 
         return new PageImpl<>(content, pageable, tuplePage.getTotalElements());

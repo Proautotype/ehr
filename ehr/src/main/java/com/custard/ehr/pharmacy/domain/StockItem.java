@@ -1,5 +1,6 @@
 package com.custard.ehr.pharmacy.domain;
 
+import com.custard.ehr.drug.domain.Drug;
 import com.custard.ehr.shared.domain.AuditableEntity;
 import com.custard.ehr.shared.exception.BusinessException;
 import jakarta.persistence.*;
@@ -27,8 +28,11 @@ public class StockItem extends AuditableEntity {
     @Column(name = "batch_number")
     private String batchNumber;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Drug product;
+    @Column
+    private UUID productId;
+
+    @Column
+    private String productName;
 
     // ✅ COST PRICE - lives on StockItem
     @Column(name = "unit_cost")
@@ -69,7 +73,7 @@ public class StockItem extends AuditableEntity {
         }
 
         if (quantityAvailable < quantity) {
-            throw new BusinessException("Insufficient stock for " + product.getName());
+            throw new BusinessException("Insufficient stock for " + productName);
         }
 
         this.quantityAvailable -= quantity;
@@ -91,8 +95,12 @@ public class StockItem extends AuditableEntity {
         return quantityAvailable;
     }
 
-    public Drug getProduct() {
-        return product;
+    public UUID getProductId() {
+        return productId;
+    }
+
+    public String getProductName() {
+        return productName;
     }
 
     @Override
@@ -101,9 +109,13 @@ public class StockItem extends AuditableEntity {
                 "id=" + id +
                 ", quantity=" + quantity +
                 ", batchNumber='" + batchNumber + '\'' +
-                ", product=" + product +
+                ", drugId='" + productId + '\'' +
+                ", drugName='" + productName + '\'' +
+                ", unitCost=" + unitCost +
+                ", totalCost=" + totalCost +
                 ", quantityAvailable=" + quantityAvailable +
                 ", version=" + version +
+                ", stock=" + stock +
                 '}';
     }
 }

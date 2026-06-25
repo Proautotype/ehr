@@ -1,14 +1,11 @@
-package com.custard.ehr.pharmacy.infrastructure;
+package com.custard.ehr.drug.infrastructure;
 
 import com.custard.ehr.pharmacy.application.dto.ProductFilterRequest;
-import com.custard.ehr.pharmacy.domain.Drug;
+import com.custard.ehr.drug.domain.Drug;
 import com.custard.ehr.pharmacy.domain.StockItem;
-import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
 import org.springframework.data.jpa.domain.Specification;
-
-import java.math.BigDecimal;
 
 public class DrugSpecification {
 

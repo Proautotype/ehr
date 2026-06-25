@@ -1,80 +1,90 @@
-package com.custard.ehr.pharmacy.domain;
+package com.custard.ehr.pharmacy.application.dto;
 
-import com.custard.ehr.shared.domain.AuditableEntity;
-import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import com.custard.ehr.pharmacy.domain.StockItem;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-@Entity
-@Table(name = "suppliers")
-@Getter
-@Setter
-@Builder
-public class Supplier extends AuditableEntity {
-    @Id
-    @Column(nullable = false)
-    private UUID id;
+public class ViewSupplierDto {
 
-    @Column(name = "name", nullable = false, length = 255)
+    private UUID id;
     private String name;
 
-    @Column(name = "code", length = 50, unique = true)
     private String code;
 
-    @Column(name = "contact_person", length = 255)
     private String contactPerson;
 
-    @Column(name = "email", length = 255)
     private String email;
 
-    @Column(name = "phone", length = 50)
     private String phone;
 
-    @Column(name = "address", columnDefinition = "TEXT")
     private String address;
 
-    @Column(name = "city", length = 100)
     private String city;
 
-    @Column(name = "state", length = 100)
     private String state;
 
-    @Column(name = "country", length = 100)
     private String country;
 
-    @Column(name = "postal_code", length = 20)
     private String postalCode;
 
-    @Column(name = "tax_id", length = 100)
     private String taxId;
 
-    @Column(name = "payment_terms", length = 100)
     private String paymentTerms;
 
-    @Column(name = "notes", columnDefinition = "TEXT")
     private String notes;
 
-    @Column(name = "rating")
     private Integer rating = 3;
 
-    @Column(name = "is_preferred")
     private Boolean isPreferred = false;
 
-    @OneToMany(mappedBy = "supplier", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Stock> stocks = new ArrayList<>();
+    private List<StockItemResponse> supplies = new ArrayList<>();
 
-
-    public UUID getId() {
-        return id;
+    public ViewSupplierDto(UUID id, String name, String code, String contactPerson, String email, String phone, String address, String city, String state, String country, String postalCode, String taxId, String paymentTerms, String notes, Integer rating, Boolean isPreferred) {
+        this.id = id;
+        this.name = name;
+        this.code = code;
+        this.contactPerson = contactPerson;
+        this.email = email;
+        this.phone = phone;
+        this.address = address;
+        this.city = city;
+        this.state = state;
+        this.country = country;
+        this.postalCode = postalCode;
+        this.taxId = taxId;
+        this.paymentTerms = paymentTerms;
+        this.notes = notes;
+        this.rating = rating;
+        this.isPreferred = isPreferred;
     }
 
-    public void setId(UUID id) {
+    public ViewSupplierDto(UUID id, String name,
+                           String code, String contactPerson,
+                           String email, String phone, String address,
+                           String city, String state, String country,
+                           String postalCode, String taxId, String paymentTerms,
+                           String notes, Integer rating, Boolean isPreferred,
+                           List<StockItem> supplies
+                           ) {
         this.id = id;
+        this.name = name;
+        this.code = code;
+        this.contactPerson = contactPerson;
+        this.email = email;
+        this.phone = phone;
+        this.address = address;
+        this.city = city;
+        this.state = state;
+        this.country = country;
+        this.postalCode = postalCode;
+        this.taxId = taxId;
+        this.paymentTerms = paymentTerms;
+        this.notes = notes;
+        this.rating = rating;
+        this.isPreferred = isPreferred;
+        this.supplies = supplies.stream().map(StockItemResponse::from).toList();
     }
 
     public String getName() {
@@ -195,13 +205,5 @@ public class Supplier extends AuditableEntity {
 
     public void setPreferred(Boolean preferred) {
         isPreferred = preferred;
-    }
-
-    public List<Stock> getStocks() {
-        return stocks;
-    }
-
-    public void setStocks(List<Stock> stocks) {
-        this.stocks = stocks;
     }
 }

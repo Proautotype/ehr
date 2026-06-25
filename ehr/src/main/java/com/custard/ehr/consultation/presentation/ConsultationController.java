@@ -40,7 +40,7 @@ public class ConsultationController {
             summary = "Record consultation",
             description = "Records a new consultation for a given encounter"
     )
-    @ApiResponses({
+    @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
                     description = "Consultation recorded successfully",

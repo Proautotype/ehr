@@ -1,13 +1,13 @@
 package com.custard.ehr.pharmacy.application.services;
 
-import com.custard.ehr.pharmacy.DrugIdentifierVerifier;
+import com.custard.ehr.drug.DrugIdentifierVerifier;
+import com.custard.ehr.drug.application.ports.DrugRepository;
+import com.custard.ehr.drug.domain.Drug;
 import com.custard.ehr.pharmacy.application.dto.AddStockRequest;
 import com.custard.ehr.pharmacy.application.dto.CreateStockItemRequest;
 import com.custard.ehr.pharmacy.application.dto.StockItemResponse;
-import com.custard.ehr.pharmacy.application.ports.DrugRepository;
 import com.custard.ehr.pharmacy.application.ports.StockMovementRepository;
 import com.custard.ehr.pharmacy.application.ports.StockRepository;
-import com.custard.ehr.pharmacy.domain.Drug;
 import com.custard.ehr.pharmacy.domain.StockItem;
 import com.custard.ehr.pharmacy.domain.StockMovement;
 import com.custard.ehr.pharmacy.domain.StockMovementType;
@@ -173,8 +173,8 @@ public class StockService {
         eventPublisher.publishEvent(
                 new StockAddedEvent(
                         stockItem.getId(),
-                        stockItem.getProduct().getId(),
-                        stockItem.getProduct().getName(),
+                        stockItem.getProductId(),
+                        stockItem.getProductName(),
                         quantity,
                         performedBy,
                         Instant.now()
@@ -184,7 +184,7 @@ public class StockService {
         log.debug(
                 "StockAddedEvent published. StockItem={}, Drug={}, Quantity={}",
                 stockItem.getId(),
-                stockItem.getProduct().getId(),
+                stockItem.getProductId(),
                 quantity
         );
     }

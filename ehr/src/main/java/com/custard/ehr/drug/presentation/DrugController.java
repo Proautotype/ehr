@@ -1,7 +1,9 @@
-package com.custard.ehr.pharmacy.presentation;
+package com.custard.ehr.drug.presentation;
 
-import com.custard.ehr.pharmacy.application.dto.DrugResponse;
-import com.custard.ehr.pharmacy.application.services.DrugService;
+import com.custard.ehr.consultation.application.dto.CreateConsultationRequest;
+import com.custard.ehr.drug.application.dto.CreateDrugDto;
+import com.custard.ehr.drug.application.dto.DrugResponse;
+import com.custard.ehr.drug.application.services.DrugService;
 import com.custard.ehr.shared.domain.PageResultDto;
 import com.custard.ehr.shared.infrastruture.web.AppApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -11,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,12 +36,40 @@ public class DrugController {
         this.drugService = drugService;
     }
 
+    @PostMapping("/create")
+    @Operation(
+            summary = "create drug",
+            description = "Create a new drug"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "Drug created successfully"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Drug already exist"
+            )
+    })
+    public AppApiResponse<DrugResponse> createDrug(
+            @Valid
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Drug creation payload",
+                    required = true,
+                    content = @Content(schema = @Schema(implementation = CreateDrugDto.class))
+            )
+            @RequestBody CreateDrugDto createDrugDto
+    ) {
+        DrugResponse drugResponse = drugService.create(createDrugDto);
+        return AppApiResponse.success(drugResponse);
+    }
+
     @GetMapping("/search")
     @Operation(
             summary = "Search drugs",
             description = "Search drug catalog by name, code, or keyword"
     )
-    @ApiResponses({
+    @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
                     description = "Search results retrieved successfully",

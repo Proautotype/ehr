@@ -1,7 +1,7 @@
-package com.custard.ehr.pharmacy;
+package com.custard.ehr.drug;
 
-import com.custard.ehr.pharmacy.application.ports.DrugRepository;
-import com.custard.ehr.pharmacy.domain.Drug;
+import com.custard.ehr.drug.application.ports.DrugRepository;
+import com.custard.ehr.drug.domain.Drug;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

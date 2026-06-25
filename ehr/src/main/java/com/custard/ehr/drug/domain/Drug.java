@@ -1,5 +1,7 @@
-package com.custard.ehr.pharmacy.domain;
+package com.custard.ehr.drug.domain;
 
+import com.custard.ehr.pharmacy.domain.StockItem;
+import com.custard.ehr.pharmacy.domain.Supplier;
 import com.custard.ehr.shared.domain.AuditableEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -44,10 +46,22 @@ public class Drug extends AuditableEntity {
 
     protected Drug() {}
 
-    public Drug(String name, String strength, String form) {
+    public Drug(String name, String strength, String form, String description, String code, String unit, BigDecimal currentSellingPrice) {
         this.name = name;
         this.strength = strength;
         this.form = form;
+        this.description = description;
+        this.code = code;
+        this.unit = unit;
+        this.currentSellingPrice = currentSellingPrice;
+    }
+
+    public Drug(String name, String strength, String form, String description, String code) {
+        this.name = name;
+        this.strength = strength;
+        this.form = form;
+        this.description = description;
+        this.code = code;
     }
 
     public UUID getId() {

@@ -1,6 +1,6 @@
-package com.custard.ehr.pharmacy.application.ports;
+package com.custard.ehr.drug.application.ports;
 
-import com.custard.ehr.pharmacy.domain.Drug;
+import com.custard.ehr.drug.domain.Drug;
 import jakarta.persistence.Tuple;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
